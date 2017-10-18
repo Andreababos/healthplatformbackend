@@ -13,7 +13,7 @@ namespace RS.NetDiet.Therapist.Api.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "201710181550050_InitialCreate"; }
+            get { return "201710181957186_InitialCreate"; }
         }
         
         string IMigrationMetadata.Source

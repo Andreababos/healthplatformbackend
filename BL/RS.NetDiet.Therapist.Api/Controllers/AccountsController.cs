@@ -2,7 +2,6 @@
 using RS.NetDiet.Therapist.Api.Infrastructure;
 using RS.NetDiet.Therapist.Api.Models;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Http;
 
