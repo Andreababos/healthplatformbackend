@@ -6,6 +6,7 @@ namespace RS.NetDiet.Therapist.Api.Models
     {
         [Required]
         [EmailAddress]
+        [DataType(DataType.EmailAddress)]
         public string Email { get; set; }
 
         [Required]
@@ -29,6 +30,7 @@ namespace RS.NetDiet.Therapist.Api.Models
 
         [Required]
         [Phone]
+        [DataType(DataType.PhoneNumber)]
         public string PhoneNumber { get; set; }
 
         [Required]

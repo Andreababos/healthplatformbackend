@@ -17,6 +17,20 @@ namespace RS.NetDiet.Therapist.Api.Infrastructure
             var ndDbContext = context.Get<NdDbContext>();
             var ndUserManager = new NdUserManager(new UserStore<NdUser>(ndDbContext));
 
+            ndUserManager.UserValidator = new UserValidator<NdUser>(ndUserManager)
+            {
+                RequireUniqueEmail = true
+            };
+
+            ndUserManager.PasswordValidator = new PasswordValidator
+            {
+                RequiredLength = 8,
+                RequireNonLetterOrDigit = true,
+                RequireDigit = true,
+                RequireLowercase = true,
+                RequireUppercase = true,
+            };
+
             return ndUserManager;
         }
     }

@@ -58,7 +58,8 @@ namespace RS.NetDiet.Therapist.Api.Controllers
                 FirstName = createTherapistDto.FirstName,
                 Gender = createTherapistDto.Gender,
                 LastName = createTherapistDto.LastName,
-                PhoneNumber = createTherapistDto.PhoneNumber
+                PhoneNumber = createTherapistDto.PhoneNumber,
+                UserName = createTherapistDto.Email
             };
 
             IdentityResult addUserResult = await NdUserManager.CreateAsync(user, createTherapistDto.Password);
@@ -71,6 +72,24 @@ namespace RS.NetDiet.Therapist.Api.Controllers
             Uri locationHeader = new Uri(Url.Link("GetUserById", new { id = user.Id }));
 
             return Created(locationHeader, Factory.Create(user));
+        }
+
+        [Route("changepassword")]
+        public async Task<IHttpActionResult> ChangePassword(ChangePasswordDto changePasswordDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            IdentityResult result = await NdUserManager.ChangePasswordAsync(User.Identity.GetUserId(), changePasswordDto.OldPassword, changePasswordDto.NewPassword);
+
+            if (!result.Succeeded)
+            {
+                return GetErrorResult(result);
+            }
+
+            return Ok();
         }
     }
 }

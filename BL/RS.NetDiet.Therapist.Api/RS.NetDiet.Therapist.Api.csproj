@@ -161,6 +161,7 @@
       <DependentUpon>201710181550050_InitialCreate.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Models\ChangePasswordDto.cs" />
     <Compile Include="Models\CreateTherapistDto.cs" />
     <Compile Include="Models\Gender.cs" />
     <Compile Include="Models\Factory.cs" />
