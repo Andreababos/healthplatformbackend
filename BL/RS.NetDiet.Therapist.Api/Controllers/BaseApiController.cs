@@ -11,12 +11,21 @@ namespace RS.NetDiet.Therapist.Api.Controllers
     {
         private Factory _factory;
         private NdUserManager _ndUserManager = null;
+        private NdRoleManager _ndRoleManager = null;
 
         protected NdUserManager NdUserManager
         {
             get
             {
                 return _ndUserManager ?? Request.GetOwinContext().GetUserManager<NdUserManager>();
+            }
+        }
+
+        protected NdRoleManager NdRoleManager
+        {
+            get
+            {
+                return _ndRoleManager ?? Request.GetOwinContext().GetUserManager<NdRoleManager>();
             }
         }
 

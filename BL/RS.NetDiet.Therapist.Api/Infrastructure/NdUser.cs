@@ -1,6 +1,10 @@
 ﻿using Microsoft.AspNet.Identity.EntityFramework;
 using RS.NetDiet.Therapist.Api.Models;
 using System.ComponentModel.DataAnnotations;
+using System;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using Microsoft.AspNet.Identity;
 
 namespace RS.NetDiet.Therapist.Api.Infrastructure
 {
@@ -19,5 +23,12 @@ namespace RS.NetDiet.Therapist.Api.Infrastructure
 
         [Required]
         public Gender Gender { get; set; }
+        
+        public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<NdUser> manager, string authenticationType)
+        {
+            var userIdentity = await manager.CreateIdentityAsync(this, authenticationType);
+            
+            return userIdentity;
+        }
     }
 }

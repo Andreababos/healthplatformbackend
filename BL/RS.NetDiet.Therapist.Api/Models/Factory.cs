@@ -1,4 +1,5 @@
-﻿using RS.NetDiet.Therapist.Api.Infrastructure;
+﻿using Microsoft.AspNet.Identity.EntityFramework;
+using RS.NetDiet.Therapist.Api.Infrastructure;
 using System.Net.Http;
 using System.Web.Http.Routing;
 
@@ -28,6 +29,16 @@ namespace RS.NetDiet.Therapist.Api.Models
                 Gender = ndUser.Gender,
                 LastName = ndUser.LastName,
                 PhoneNumber = ndUser.PhoneNumber
+            };
+        }
+
+        public RoleReturnDto Create(IdentityRole ndRole)
+        {
+            return new RoleReturnDto
+            {
+                Url = _UrlHelper.Link("GetRoleById", new { id = ndRole.Id }),
+                Id = ndRole.Id,
+                Name = ndRole.Name
             };
         }
     }

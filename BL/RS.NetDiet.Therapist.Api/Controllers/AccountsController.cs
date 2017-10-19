@@ -2,6 +2,7 @@
 using RS.NetDiet.Therapist.Api.Infrastructure;
 using RS.NetDiet.Therapist.Api.Models;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Http;
 
@@ -10,12 +11,14 @@ namespace RS.NetDiet.Therapist.Api.Controllers
     [RoutePrefix("api/accounts")]
     public class AccountsController : BaseApiController
     {
-        //[Route("users")]
-        //public IHttpActionResult GetUsers()
-        //{
-        //    return Ok(NdUserManager.Users.ToList().Select(u => Factory.Create(u)));
-        //}
+        [Authorize(Roles = "Admin")]
+        [Route("users")]
+        public IHttpActionResult GetUsers()
+        {
+            return Ok(NdUserManager.Users.ToList().Select(u => Factory.Create(u)));
+        }
 
+        [Authorize(Roles = "Admin")]
         [Route("user/{id:guid}", Name = "GetUserById")]
         public async Task<IHttpActionResult> GetUser(string Id)
         {
@@ -29,19 +32,35 @@ namespace RS.NetDiet.Therapist.Api.Controllers
             return NotFound();
         }
 
-        //[Route("user/{username}")]
-        //public async Task<IHttpActionResult> GetUserByName(string username)
-        //{
-        //    var user = await NdUserManager.FindByNameAsync(username);
+        [Authorize(Roles = "Admin")]
+        [Route("user/{username}")]
+        public async Task<IHttpActionResult> GetUserByUsername(string username)
+        {
+            var user = await NdUserManager.FindByNameAsync(username);
 
-        //    if (user != null)
-        //    {
-        //        return Ok(Factory.Create(user));
-        //    }
+            if (user != null)
+            {
+                return Ok(Factory.Create(user));
+            }
 
-        //    return NotFound();
-        //}
+            return NotFound();
+        }
 
+        [Authorize(Roles = "Admin")]
+        [Route("user/{email}")]
+        public async Task<IHttpActionResult> GetUserByEmail(string email)
+        {
+            var user = await NdUserManager.FindByEmailAsync(email);
+
+            if (user != null)
+            {
+                return Ok(Factory.Create(user));
+            }
+
+            return NotFound();
+        }
+
+        [Authorize(Roles = "Admin")]
         [Route("create/therapist")]
         public async Task<IHttpActionResult> CreateTherapis(CreateTherapistDto createTherapistDto)
         {
@@ -61,7 +80,7 @@ namespace RS.NetDiet.Therapist.Api.Controllers
                 UserName = createTherapistDto.Email
             };
 
-            IdentityResult addUserResult = await NdUserManager.CreateAsync(user, createTherapistDto.Password);
+            IdentityResult addUserResult = await NdUserManager.CreateAsync(user, PasswordGenerator.Generate());
 
             if (!addUserResult.Succeeded)
             {
@@ -73,6 +92,40 @@ namespace RS.NetDiet.Therapist.Api.Controllers
             return Created(locationHeader, Factory.Create(user));
         }
 
+        [Authorize(Roles = "DevAdmin")]
+        [Route("create/admin")]
+        public async Task<IHttpActionResult> CreateAdmin(CreateAdminDto createAdminDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var user = new NdUser()
+            {
+                Email = createAdminDto.Email,
+                EmailConfirmed = true,
+                FirstName = createAdminDto.FirstName,
+                Gender = createAdminDto.Gender,
+                LastName = createAdminDto.LastName,
+                PhoneNumber = createAdminDto.PhoneNumber,
+                PhoneNumberConfirmed = true,
+                UserName = createAdminDto.Email
+            };
+
+            IdentityResult addUserResult = await NdUserManager.CreateAsync(user, createAdminDto.Password);
+
+            if (!addUserResult.Succeeded)
+            {
+                return GetErrorResult(addUserResult);
+            }
+
+            Uri locationHeader = new Uri(Url.Link("GetUserById", new { id = user.Id }));
+
+            return Created(locationHeader, Factory.Create(user));
+        }
+
+        [Authorize(Roles = "Therapist")]
         [Route("changepassword")]
         public async Task<IHttpActionResult> ChangePassword(ChangePasswordDto changePasswordDto)
         {
@@ -86,6 +139,65 @@ namespace RS.NetDiet.Therapist.Api.Controllers
             if (!result.Succeeded)
             {
                 return GetErrorResult(result);
+            }
+
+            return Ok();
+        }
+
+        [Authorize(Roles = "DevAdmin")]
+        [Route("user/{id:guid}")]
+        public async Task<IHttpActionResult> DeleteUser(string id)
+        {
+            var ndUser = await NdUserManager.FindByIdAsync(id);
+
+            if (ndUser != null)
+            {
+                IdentityResult result = await NdUserManager.DeleteAsync(ndUser);
+
+                if (!result.Succeeded)
+                {
+                    return GetErrorResult(result);
+                }
+
+                return Ok();
+
+            }
+
+            return NotFound();
+        }
+
+        [Authorize(Roles = "DevAdmin")]
+        [Route("user/{id:guid}/roles")]
+        [HttpPut]
+        public async Task<IHttpActionResult> AssignRolesToUser([FromUri] string id, [FromBody] string[] rolesToAssign)
+        {
+            var ndUser = await NdUserManager.FindByIdAsync(id);
+
+            if (ndUser == null)
+            {
+                return NotFound();
+            }
+
+            var currentRoles = await NdUserManager.GetRolesAsync(ndUser.Id);
+            var rolesNotExists = rolesToAssign.Except(NdRoleManager.Roles.Select(x => x.Name)).ToArray();
+            if (rolesNotExists.Count() > 0)
+            {
+                ModelState.AddModelError("", string.Format("Roles '{0}' does not exixts in the system", string.Join(",", rolesNotExists)));
+                return BadRequest(ModelState);
+            }
+
+            IdentityResult removeResult = await NdUserManager.RemoveFromRolesAsync(ndUser.Id, currentRoles.ToArray());
+            if (!removeResult.Succeeded)
+            {
+                ModelState.AddModelError("", "Failed to remove user roles");
+                return BadRequest(ModelState);
+            }
+
+            IdentityResult addResult = await NdUserManager.AddToRolesAsync(ndUser.Id, rolesToAssign);
+            if (!addResult.Succeeded)
+            {
+                ModelState.AddModelError("", "Failed to add user roles");
+                return BadRequest(ModelState);
             }
 
             return Ok();
