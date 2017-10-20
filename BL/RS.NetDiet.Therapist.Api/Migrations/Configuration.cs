@@ -32,16 +32,18 @@ namespace RS.NetDiet.Therapist.Api.Migrations
                 PhoneNumberConfirmed = true,
                 FirstName = "Developer",
                 LastName = "Admin",
-                Gender = Gender.Male
+                Gender = Gender.Male,
+                Title = Title.Mr
             };
             userManager.Create(user, "4Zist#kbasszonmeg");
 
-            if (!roleManager.Roles.Any(x => x.Name == "DevAdmin")) { roleManager.Create(new IdentityRole { Name = "DevAdmin" }); }
-            if (!roleManager.Roles.Any(x => x.Name == "Admin")) { roleManager.Create(new IdentityRole { Name = "Admin" }); }
-            if (!roleManager.Roles.Any(x => x.Name == "Therapist")) { roleManager.Create(new IdentityRole { Name = "Therapist" }); }
+            foreach (var role in Enum.GetNames(typeof(Role)))
+            {
+                if (!roleManager.Roles.Any(x => x.Name == role)) { roleManager.Create(new IdentityRole { Name = role }); }
+            }
 
             var devAdminUser = userManager.FindByName("devadmin");
-            userManager.AddToRoles(devAdminUser.Id, new string[] { "DevAdmin", "Admin", "Therapist" });
+            userManager.AddToRoles(devAdminUser.Id, Enum.GetNames(typeof(Role)));
         }
     }
 }

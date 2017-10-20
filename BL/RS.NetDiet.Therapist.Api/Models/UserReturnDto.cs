@@ -18,7 +18,9 @@ namespace RS.NetDiet.Therapist.Api.Models
 
         public string PhoneNumber { get; set; }
 
-        public Gender? Gender { get; set; }
+        public Gender Gender { get; set; }
+
+        public Title Title { get; set; }
         
         public IList<string> Roles { get; set; }
     }

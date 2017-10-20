@@ -39,6 +39,7 @@ namespace RS.NetDiet.Therapist.Api.Migrations
                         LastName = c.String(nullable: false, maxLength: 100),
                         Clinic = c.String(maxLength: 100),
                         Gender = c.Int(nullable: false),
+                        Title = c.Int(nullable: false),
                         Email = c.String(maxLength: 256),
                         EmailConfirmed = c.Boolean(nullable: false),
                         PasswordHash = c.String(),

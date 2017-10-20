@@ -23,6 +23,9 @@ namespace RS.NetDiet.Therapist.Api.Infrastructure
 
         [Required]
         public Gender Gender { get; set; }
+
+        [Required]
+        public Title Title { get; set; }
         
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<NdUser> manager, string authenticationType)
         {

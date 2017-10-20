@@ -77,12 +77,18 @@ namespace RS.NetDiet.Therapist.Api.Controllers
                 Gender = createTherapistDto.Gender,
                 LastName = createTherapistDto.LastName,
                 PhoneNumber = createTherapistDto.PhoneNumber,
+                Title = createTherapistDto.Title,
                 UserName = createTherapistDto.Email
             };
 
             IdentityResult addUserResult = await NdUserManager.CreateAsync(user, PasswordGenerator.Generate());
-
             if (!addUserResult.Succeeded)
+            {
+                return GetErrorResult(addUserResult);
+            }
+
+            IdentityResult addUserToRoleResult = await NdUserManager.AddToRoleAsync(user.Id, "Therapist");
+            if (!addUserToRoleResult.Succeeded)
             {
                 return GetErrorResult(addUserResult);
             }
@@ -110,12 +116,18 @@ namespace RS.NetDiet.Therapist.Api.Controllers
                 LastName = createAdminDto.LastName,
                 PhoneNumber = createAdminDto.PhoneNumber,
                 PhoneNumberConfirmed = true,
+                Title = createAdminDto.Title,
                 UserName = createAdminDto.Email
             };
 
             IdentityResult addUserResult = await NdUserManager.CreateAsync(user, createAdminDto.Password);
-
             if (!addUserResult.Succeeded)
+            {
+                return GetErrorResult(addUserResult);
+            }
+
+            IdentityResult addUserToRoleResult = await NdUserManager.AddToRoleAsync(user.Id, "Admin");
+            if (!addUserToRoleResult.Succeeded)
             {
                 return GetErrorResult(addUserResult);
             }

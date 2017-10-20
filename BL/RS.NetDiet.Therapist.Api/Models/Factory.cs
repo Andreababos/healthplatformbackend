@@ -28,7 +28,20 @@ namespace RS.NetDiet.Therapist.Api.Models
                 FirstName = ndUser.FirstName,
                 Gender = ndUser.Gender,
                 LastName = ndUser.LastName,
-                PhoneNumber = ndUser.PhoneNumber
+                PhoneNumber = ndUser.PhoneNumber,
+                Title = ndUser.Title
+            };
+        }
+
+        public TherapistDto CreateTherapist(NdUser ndUser)
+        {
+            return new TherapistDto
+            {
+                Clinic = ndUser.Clinic,
+                FirstName = ndUser.FirstName,
+                Gender = ndUser.Gender,
+                LastName = ndUser.LastName,
+                Title = ndUser.Title
             };
         }
 

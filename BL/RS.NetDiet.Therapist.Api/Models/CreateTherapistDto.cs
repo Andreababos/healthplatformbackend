@@ -19,6 +19,9 @@ namespace RS.NetDiet.Therapist.Api.Models
         public Gender Gender { get; set; }
 
         [Required]
+        public Title Title { get; set; }
+
+        [Required]
         [Phone]
         [DataType(DataType.PhoneNumber)]
         public string PhoneNumber { get; set; }
