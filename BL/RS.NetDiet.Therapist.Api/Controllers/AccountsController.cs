@@ -74,10 +74,10 @@ namespace RS.NetDiet.Therapist.Api.Controllers
                 Clinic = createTherapistDto.Clinic,
                 Email = createTherapistDto.Email,
                 FirstName = createTherapistDto.FirstName,
-                Gender = createTherapistDto.Gender,
+                Gender = createTherapistDto.Gender.Value,
                 LastName = createTherapistDto.LastName,
                 PhoneNumber = createTherapistDto.PhoneNumber,
-                Title = createTherapistDto.Title,
+                Title = createTherapistDto.Title.Value,
                 UserName = createTherapistDto.Email
             };
 
@@ -112,11 +112,11 @@ namespace RS.NetDiet.Therapist.Api.Controllers
                 Email = createAdminDto.Email,
                 EmailConfirmed = true,
                 FirstName = createAdminDto.FirstName,
-                Gender = createAdminDto.Gender,
+                Gender = createAdminDto.Gender.Value,
                 LastName = createAdminDto.LastName,
                 PhoneNumber = createAdminDto.PhoneNumber,
                 PhoneNumberConfirmed = true,
-                Title = createAdminDto.Title,
+                Title = createAdminDto.Title.Value,
                 UserName = createAdminDto.Email
             };
 

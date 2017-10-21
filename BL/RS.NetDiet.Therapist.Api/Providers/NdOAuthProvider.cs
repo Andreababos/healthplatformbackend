@@ -21,7 +21,16 @@ namespace RS.NetDiet.Therapist.Api.Providers
             context.OwinContext.Response.Headers.Add("Access-Control-Allow-Origin", new[] { allowedOrigin });
 
             var userManager = context.OwinContext.GetUserManager<NdUserManager>();
-            NdUser user = await userManager.FindAsync(context.UserName, context.Password);
+            NdUser user = await userManager.FindByEmailAsync(context.UserName);
+            if (user != null)
+            {
+                user = await userManager.FindAsync(user.UserName, context.Password);
+            }
+            else
+            {
+                user = await userManager.FindAsync(context.UserName, context.Password);
+            }
+            
 
             if (user == null)
             {
