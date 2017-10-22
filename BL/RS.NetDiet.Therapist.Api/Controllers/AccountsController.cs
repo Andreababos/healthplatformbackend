@@ -2,8 +2,10 @@
 using RS.NetDiet.Therapist.Api.Infrastructure;
 using RS.NetDiet.Therapist.Api.Models;
 using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Http;
 
 namespace RS.NetDiet.Therapist.Api.Controllers
@@ -11,14 +13,14 @@ namespace RS.NetDiet.Therapist.Api.Controllers
     [RoutePrefix("api/accounts")]
     public class AccountsController : BaseApiController
     {
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "DevAdmin, Admin")]
         [Route("users")]
         public IHttpActionResult GetUsers()
         {
             return Ok(NdUserManager.Users.ToList().Select(u => Factory.Create(u)));
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "DevAdmin, Admin")]
         [Route("user/{id:guid}", Name = "GetUserById")]
         public async Task<IHttpActionResult> GetUser(string Id)
         {
@@ -32,7 +34,7 @@ namespace RS.NetDiet.Therapist.Api.Controllers
             return NotFound();
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "DevAdmin, Admin")]
         [Route("user/{username}")]
         public async Task<IHttpActionResult> GetUserByUsername(string username)
         {
@@ -46,7 +48,7 @@ namespace RS.NetDiet.Therapist.Api.Controllers
             return NotFound();
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "DevAdmin, Admin")]
         [Route("user/{email}")]
         public async Task<IHttpActionResult> GetUserByEmail(string email)
         {
@@ -60,7 +62,7 @@ namespace RS.NetDiet.Therapist.Api.Controllers
             return NotFound();
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "DevAdmin, Admin")]
         [Route("create/therapist")]
         public async Task<IHttpActionResult> CreateTherapis(CreateTherapistDto createTherapistDto)
         {
@@ -93,8 +95,16 @@ namespace RS.NetDiet.Therapist.Api.Controllers
                 return GetErrorResult(addUserResult);
             }
 
-            Uri locationHeader = new Uri(Url.Link("GetUserById", new { id = user.Id }));
+            try
+            {
+                Directory.CreateDirectory(HttpContext.Current.Server.MapPath(Path.Combine("~/Results", user.Id)));
+            }
+            catch(Exception ex)
+            {
+                return InternalServerError(ex);
+            }
 
+            Uri locationHeader = new Uri(Url.Link("GetUserById", new { id = user.Id }));
             return Created(locationHeader, Factory.Create(user));
         }
 
@@ -137,7 +147,7 @@ namespace RS.NetDiet.Therapist.Api.Controllers
             return Created(locationHeader, Factory.Create(user));
         }
 
-        [Authorize(Roles = "Therapist")]
+        [Authorize(Roles = "DevAdmin, Admin, Therapist")]
         [Route("changepassword")]
         public async Task<IHttpActionResult> ChangePassword(ChangePasswordDto changePasswordDto)
         {

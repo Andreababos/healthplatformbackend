@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNet.Identity.EntityFramework;
 using RS.NetDiet.Therapist.Api.Models;
 using System.ComponentModel.DataAnnotations;
-using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;

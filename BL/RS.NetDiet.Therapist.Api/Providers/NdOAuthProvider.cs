@@ -2,6 +2,8 @@
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.OAuth;
 using RS.NetDiet.Therapist.Api.Infrastructure;
+using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -45,8 +47,30 @@ namespace RS.NetDiet.Therapist.Api.Providers
             }
 
             ClaimsIdentity oAuthIdentity = await user.GenerateUserIdentityAsync(userManager, "JWT");
-            var ticket = new AuthenticationTicket(oAuthIdentity, null);
+            AuthenticationProperties properties = CreateProperties(user);
+            var ticket = new AuthenticationTicket(oAuthIdentity, properties);
+
             context.Validated(ticket);
+        }
+
+        public override Task TokenEndpoint(OAuthTokenEndpointContext context)
+        {
+            foreach (KeyValuePair<string, string> property in context.Properties.Dictionary)
+            {
+                context.AdditionalResponseParameters.Add(property.Key, property.Value);
+            }
+
+            return Task.FromResult<object>(null);
+        }
+
+        public static AuthenticationProperties CreateProperties(NdUser user)
+        {
+            IDictionary<string, string> data = new Dictionary<string, string>
+            {
+                { "id", user.Id },
+                { "email", user.Email }
+            };
+            return new AuthenticationProperties(data);
         }
     }
 }

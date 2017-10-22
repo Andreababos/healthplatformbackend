@@ -43,7 +43,7 @@ namespace RS.NetDiet.Therapist.Api.Migrations
             }
 
             var devAdminUser = userManager.FindByName("devadmin");
-            userManager.AddToRoles(devAdminUser.Id, Enum.GetNames(typeof(Role)));
+            userManager.AddToRoles(devAdminUser.Id, Role.DevAdmin.ToString());
         }
     }
 }

@@ -8,7 +8,7 @@ namespace RS.NetDiet.Therapist.Api.Controllers
     [RoutePrefix("api/therapists")]
     public class TherapistController : BaseApiController
     {
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "DevAdmin, Admin")]
         [Route("all")]
         public async Task<IHttpActionResult> GetTherapists()
         {

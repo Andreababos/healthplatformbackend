@@ -213,6 +213,15 @@
       <DependentUpon>201710202325518_InitialCreate.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Results\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\RS.NetDiet.Therapist.DataModel\RS.NetDiet.Therapist.DataModel.csproj">
+      <Project>{b3a6195a-a734-47b2-b159-91f26ec966f7}</Project>
+      <Name>RS.NetDiet.Therapist.DataModel</Name>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
