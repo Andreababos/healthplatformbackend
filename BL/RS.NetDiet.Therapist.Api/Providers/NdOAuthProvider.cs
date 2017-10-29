@@ -67,7 +67,6 @@ namespace RS.NetDiet.Therapist.Api.Providers
         {
             IDictionary<string, string> data = new Dictionary<string, string>
             {
-                { "id", user.Id },
                 { "email", user.Email }
             };
             return new AuthenticationProperties(data);

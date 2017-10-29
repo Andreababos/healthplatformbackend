@@ -5,6 +5,9 @@ namespace RS.NetDiet.Therapist.Api.Models
     public class CreateAdminDto
     {
         [Required]
+        public string UserName { get; set; }
+
+        [Required]
         [EmailAddress]
         [DataType(DataType.EmailAddress)]
         public string Email { get; set; }

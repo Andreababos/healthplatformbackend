@@ -2,9 +2,9 @@
 {
     public enum Title
     {
-        Mr,
-        Mrs,
-        Ms,
-        Dr
+        Mr = 0,
+        Mrs = 1,
+        Ms = 2,
+        Dr = 3
     }
 }

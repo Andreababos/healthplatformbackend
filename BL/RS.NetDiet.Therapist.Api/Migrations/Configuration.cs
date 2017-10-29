@@ -35,7 +35,7 @@ namespace RS.NetDiet.Therapist.Api.Migrations
                 Gender = Gender.Male,
                 Title = Title.Mr
             };
-            userManager.Create(user, "4Zist#kbasszonmeg");
+            userManager.Create(user, "j9up1uuU!");
 
             foreach (var role in Enum.GetNames(typeof(Role)))
             {

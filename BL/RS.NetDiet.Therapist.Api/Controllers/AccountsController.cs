@@ -15,6 +15,7 @@ namespace RS.NetDiet.Therapist.Api.Controllers
     {
         [Authorize(Roles = "DevAdmin, Admin")]
         [Route("users")]
+        [HttpGet]
         public IHttpActionResult GetUsers()
         {
             return Ok(NdUserManager.Users.ToList().Select(u => Factory.Create(u)));
@@ -22,6 +23,7 @@ namespace RS.NetDiet.Therapist.Api.Controllers
 
         [Authorize(Roles = "DevAdmin, Admin")]
         [Route("user/{id:guid}", Name = "GetUserById")]
+        [HttpGet]
         public async Task<IHttpActionResult> GetUser(string Id)
         {
             var user = await NdUserManager.FindByIdAsync(Id);
@@ -35,21 +37,8 @@ namespace RS.NetDiet.Therapist.Api.Controllers
         }
 
         [Authorize(Roles = "DevAdmin, Admin")]
-        [Route("user/{username}")]
-        public async Task<IHttpActionResult> GetUserByUsername(string username)
-        {
-            var user = await NdUserManager.FindByNameAsync(username);
-
-            if (user != null)
-            {
-                return Ok(Factory.Create(user));
-            }
-
-            return NotFound();
-        }
-
-        [Authorize(Roles = "DevAdmin, Admin")]
         [Route("user/{email}")]
+        [HttpGet]
         public async Task<IHttpActionResult> GetUserByEmail(string email)
         {
             var user = await NdUserManager.FindByEmailAsync(email);
@@ -64,6 +53,7 @@ namespace RS.NetDiet.Therapist.Api.Controllers
 
         [Authorize(Roles = "DevAdmin, Admin")]
         [Route("create/therapist")]
+        [HttpPost]
         public async Task<IHttpActionResult> CreateTherapis(CreateTherapistDto createTherapistDto)
         {
             if (!ModelState.IsValid)
@@ -110,6 +100,7 @@ namespace RS.NetDiet.Therapist.Api.Controllers
 
         [Authorize(Roles = "DevAdmin")]
         [Route("create/admin")]
+        [HttpPost]
         public async Task<IHttpActionResult> CreateAdmin(CreateAdminDto createAdminDto)
         {
             if (!ModelState.IsValid)
@@ -127,7 +118,7 @@ namespace RS.NetDiet.Therapist.Api.Controllers
                 PhoneNumber = createAdminDto.PhoneNumber,
                 PhoneNumberConfirmed = true,
                 Title = createAdminDto.Title.Value,
-                UserName = createAdminDto.Email
+                UserName = createAdminDto.UserName
             };
 
             IdentityResult addUserResult = await NdUserManager.CreateAsync(user, createAdminDto.Password);
@@ -149,6 +140,7 @@ namespace RS.NetDiet.Therapist.Api.Controllers
 
         [Authorize(Roles = "DevAdmin, Admin, Therapist")]
         [Route("changepassword")]
+        [HttpPost]
         public async Task<IHttpActionResult> ChangePassword(ChangePasswordDto changePasswordDto)
         {
             if (!ModelState.IsValid)
@@ -168,6 +160,7 @@ namespace RS.NetDiet.Therapist.Api.Controllers
 
         [Authorize(Roles = "DevAdmin")]
         [Route("user/{id:guid}")]
+        [HttpDelete]
         public async Task<IHttpActionResult> DeleteUser(string id)
         {
             var ndUser = await NdUserManager.FindByIdAsync(id);

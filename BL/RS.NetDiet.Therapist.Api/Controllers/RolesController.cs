@@ -12,6 +12,7 @@ namespace RS.NetDiet.Therapist.Api.Controllers
     public class RolesController : BaseApiController
     {
         [Route("{id:guid}", Name = "GetRoleById")]
+        [HttpGet]
         public async Task<IHttpActionResult> GetRole(string Id)
         {
             var role = await NdRoleManager.FindByIdAsync(Id);
@@ -25,6 +26,7 @@ namespace RS.NetDiet.Therapist.Api.Controllers
         }
 
         [Route("", Name = "GetAllRoles")]
+        [HttpGet]
         public IHttpActionResult GetAllRoles()
         {
             var roles = NdRoleManager.Roles;
@@ -33,6 +35,7 @@ namespace RS.NetDiet.Therapist.Api.Controllers
         }
 
         [Route("create")]
+        [HttpPost]
         public async Task<IHttpActionResult> Create(CreateRoleDto createRoleDto)
         {
             if (!ModelState.IsValid)
@@ -54,6 +57,7 @@ namespace RS.NetDiet.Therapist.Api.Controllers
         }
 
         [Route("{id:guid}")]
+        [HttpDelete]
         public async Task<IHttpActionResult> DeleteRole(string Id)
         {
 
@@ -75,6 +79,7 @@ namespace RS.NetDiet.Therapist.Api.Controllers
         }
 
         [Route("ManageUsersInRole")]
+        [HttpPost]
         public async Task<IHttpActionResult> ManageUsersInRole(UsersInRoleDto usersInRoleDto)
         {
             var role = await NdRoleManager.FindByIdAsync(usersInRoleDto.Id);
