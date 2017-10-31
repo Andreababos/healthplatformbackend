@@ -2,6 +2,8 @@
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
+using RS.NetDiet.Therapist.Api.Services;
+using System;
 
 namespace RS.NetDiet.Therapist.Api.Infrastructure
 {
@@ -30,6 +32,16 @@ namespace RS.NetDiet.Therapist.Api.Infrastructure
                 RequireLowercase = true,
                 RequireUppercase = true,
             };
+
+            ndUserManager.EmailService = new NdEmailService();
+            var dataProtectionProvider = options.DataProtectionProvider;
+            if (dataProtectionProvider != null)
+            {
+                ndUserManager.UserTokenProvider = new DataProtectorTokenProvider<NdUser>(dataProtectionProvider.Create("ASP.NET Identity"))
+                {
+                    TokenLifespan = TimeSpan.FromHours(6)
+                };
+            }
 
             return ndUserManager;
         }

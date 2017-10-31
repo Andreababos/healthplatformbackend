@@ -156,11 +156,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="EmailTemplates\confirm-email.html" />
     <Content Include="packages.config" />
     <None Include="Properties\PublishProfiles\File System.pubxml" />
     <None Include="Properties\PublishProfiles\mintest.dk - FTP.pubxml" />
     <None Include="Web.Base.config">
       <DependentUpon>Web.config</DependentUpon>
+      <SubType>Designer</SubType>
     </None>
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -206,6 +208,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Providers\NdJwtFormat.cs" />
     <Compile Include="Providers\NdOAuthProvider.cs" />
+    <Compile Include="Services\NdEmailService.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>

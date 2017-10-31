@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNet.Identity;
 using RS.NetDiet.Therapist.Api.Infrastructure;
 using RS.NetDiet.Therapist.Api.Models;
+using RS.NetDiet.Therapist.Api.Services;
 using RS.NetDiet.Therapist.DataModel;
 using System;
 using System.IO;
@@ -110,11 +111,50 @@ namespace RS.NetDiet.Therapist.Api.Controllers
             catch(Exception ex)
             {
                 NdLogger.Error(string.Format("Error creating folder for therapist [email: {0}]", createTherapistDto.Email), ex);
-                return InternalServerError(ex);
+            }
+
+            try
+            {
+                string code = await NdUserManager.GenerateEmailConfirmationTokenAsync(user.Id);
+                var callbackUrl = new Uri(Url.Link("ConfirmEmailRoute", new { userId = user.Id, code = code }));
+                await NdUserManager.SendEmailAsync(user.Id, "Confirm your account", NdEmailService.CreateConfirmEmailBody(callbackUrl.ToString()));
+            }
+            catch (Exception ex)
+            {
+                NdLogger.Error(string.Format("Error sending ConfirmEmail email for therapist [email: {0}]", createTherapistDto.Email), ex);
             }
 
             Uri locationHeader = new Uri(Url.Link("GetUserById", new { id = user.Id }));
             return Created(locationHeader, Factory.Create(user));
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        [Route("confirmemail", Name = "ConfirmEmailRoute")]
+        public async Task<IHttpActionResult> ConfirmEmail(string userId = "", string code = "")
+        {
+            if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(code))
+            {
+                ModelState.AddModelError("", "User Id and Code are required");
+                NdLogger.Error(string.Format(
+                    "Model state is not valid [ModelState: {0}]",
+                    string.Join(Environment.NewLine, ModelState.Select(x => string.Format("{0}: {1}", x.Key, x.Value)))));
+                return BadRequest(ModelState);
+            }
+
+            IdentityResult result = await NdUserManager.ConfirmEmailAsync(userId, code);
+            if (result.Succeeded)
+            {
+                return Ok();
+            }
+            else
+            {
+                NdLogger.Error(string.Format(
+                    "Confirm email failed [id: {0}, code: {1}, Reason: {2}]",
+                    userId, code,
+                    string.Join(Environment.NewLine, result.Errors)));
+                return GetErrorResult(result);
+            }
         }
 
         [Authorize(Roles = "DevAdmin")]
