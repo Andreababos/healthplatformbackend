@@ -7,8 +7,10 @@ using Newtonsoft.Json.Serialization;
 using Owin;
 using RS.NetDiet.Therapist.Api.Infrastructure;
 using RS.NetDiet.Therapist.Api.Providers;
+using RS.NetDiet.Therapist.DataModel;
 using System;
 using System.Configuration;
+using System.IO;
 using System.Linq;
 using System.Net.Http.Formatting;
 using System.Web.Http;
@@ -28,6 +30,7 @@ namespace RS.NetDiet.Therapist.Api
             app.UseCors(Microsoft.Owin.Cors.CorsOptions.AllowAll);
             app.UseWebApi(httpConfig);
 
+            NdLogger.Configure();
         }
 
         private void ConfigureOAuthTokenGeneration(IAppBuilder app)

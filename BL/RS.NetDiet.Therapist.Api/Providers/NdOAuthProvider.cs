@@ -2,6 +2,7 @@
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.OAuth;
 using RS.NetDiet.Therapist.Api.Infrastructure;
+using RS.NetDiet.Therapist.DataModel;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -37,12 +38,14 @@ namespace RS.NetDiet.Therapist.Api.Providers
             if (user == null)
             {
                 context.SetError("invalid_grant", "The user name or password is incorrect.");
+                NdLogger.Debug(string.Format("The user name or password is incorrect [username: {0}, password: {1}]", context.UserName, context.Password));
                 return;
             }
 
             if (!user.EmailConfirmed)
             {
                 context.SetError("invalid_grant", "User did not confirm email.");
+                NdLogger.Debug(string.Format("User did not confirm email [username: {0}]", context.UserName));
                 return;
             }
 
@@ -51,6 +54,8 @@ namespace RS.NetDiet.Therapist.Api.Providers
             var ticket = new AuthenticationTicket(oAuthIdentity, properties);
 
             context.Validated(ticket);
+
+            NdLogger.Debug(string.Format("User logged in [username: {0}, password: {1}]", context.UserName, context.Password));
         }
 
         public override Task TokenEndpoint(OAuthTokenEndpointContext context)
