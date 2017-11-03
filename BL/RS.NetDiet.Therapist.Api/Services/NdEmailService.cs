@@ -57,6 +57,20 @@ namespace RS.NetDiet.Therapist.Api.Services
             return body;
         }
 
+        public static string CreateConfirmEmailWithPasswordBody(string callbackUrl, string password)
+        {
+            var body = CreateEmailBody(ConfigurationManager.AppSettings["emailTemplates:ConfirmEmailWithPassword"], new Dictionary<string, string>() { { "callbackUrl", callbackUrl }, { "password", password } });
+
+            return body;
+        }
+
+        public static string CreateResetPasswordBody(string callbackUrl)
+        {
+            var body = CreateEmailBody(ConfigurationManager.AppSettings["emailTemplates:ResetPassword"], new Dictionary<string, string>() { { "callbackUrl", callbackUrl } });
+
+            return body;
+        }
+
         private static string CreateEmailBody(string templateName, Dictionary<string, string> templateData = null)
         {
             string content = "";

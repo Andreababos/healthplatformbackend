@@ -178,6 +178,7 @@
   <ItemGroup>
     <Compile Include="Controllers\AccountsController.cs" />
     <Compile Include="Controllers\BaseApiController.cs" />
+    <Compile Include="Controllers\DbController.cs" />
     <Compile Include="Controllers\RolesController.cs" />
     <Compile Include="Controllers\TherapistController.cs" />
     <Compile Include="Global.asax.cs">
@@ -199,9 +200,11 @@
     <Compile Include="Models\CreateTherapistDto.cs" />
     <Compile Include="Models\Gender.cs" />
     <Compile Include="Models\Factory.cs" />
+    <Compile Include="Models\MyInfoDto.cs" />
     <Compile Include="Models\RoleReturnDto.cs" />
     <Compile Include="Models\Role.cs" />
     <Compile Include="Models\TherapistDto.cs" />
+    <Compile Include="Models\UserInfoDto.cs" />
     <Compile Include="Models\Title.cs" />
     <Compile Include="Models\UsersInRoleDto.cs" />
     <Compile Include="Models\UserReturnDto.cs" />

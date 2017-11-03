@@ -44,6 +44,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
@@ -71,6 +72,7 @@
       <DependentUpon>NdDataModel.edmx</DependentUpon>
     </Compile>
     <Compile Include="NdLogger.cs" />
+    <Compile Include="NdSqlExecutor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

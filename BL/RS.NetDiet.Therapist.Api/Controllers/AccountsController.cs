@@ -41,6 +41,24 @@ namespace RS.NetDiet.Therapist.Api.Controllers
             return NotFound();
         }
 
+        [Authorize(Roles = "DevAdmin, Admin, Therapist")]
+        [Route("profile")]
+        [HttpGet]
+        public async Task<IHttpActionResult> GetMyInfo()
+        {
+            NdLogger.Debug("Begin");
+            var id = User.Identity.GetUserId();
+            var user = await NdUserManager.FindByIdAsync(id);
+
+            if (user != null)
+            {
+                return Ok(Factory.CreateUserInfo(user));
+            }
+
+            NdLogger.Debug(string.Format("User was not found [id: {0}]", id));
+            return NotFound();
+        }
+
         [Authorize(Roles = "DevAdmin, Admin")]
         [Route("user/{email}")]
         [HttpGet]
@@ -84,7 +102,8 @@ namespace RS.NetDiet.Therapist.Api.Controllers
                 UserName = createTherapistDto.Email
             };
 
-            IdentityResult addUserResult = await NdUserManager.CreateAsync(user, PasswordGenerator.Generate());
+            var password = PasswordGenerator.Generate();
+            IdentityResult addUserResult = await NdUserManager.CreateAsync(user, password);
             if (!addUserResult.Succeeded)
             {
                 NdLogger.Error(string.Format(
@@ -117,7 +136,7 @@ namespace RS.NetDiet.Therapist.Api.Controllers
             {
                 string code = await NdUserManager.GenerateEmailConfirmationTokenAsync(user.Id);
                 var callbackUrl = new Uri(Url.Link("ConfirmEmailRoute", new { userId = user.Id, code = code }));
-                await NdUserManager.SendEmailAsync(user.Id, "Confirm your account", NdEmailService.CreateConfirmEmailBody(callbackUrl.ToString()));
+                await NdUserManager.SendEmailAsync(user.Id, "Confirm your account", NdEmailService.CreateConfirmEmailWithPasswordBody(callbackUrl.ToString(), password));
             }
             catch (Exception ex)
             {
@@ -235,6 +254,32 @@ namespace RS.NetDiet.Therapist.Api.Controllers
             return Ok();
         }
 
+        [AllowAnonymous]
+        [Route("resetpassword/{email}")]
+        [HttpGet]
+        public async Task<IHttpActionResult> ResetPassword(string email)
+        {
+            var user = await NdUserManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            try
+            {
+                string code = await NdUserManager.GeneratePasswordResetTokenAsync(user.Id);
+                var callbackUrl = new Uri(Url.Link("ResetPasswordRoute", new { userId = user.Id, code = code }));
+                await NdUserManager.SendEmailAsync(user.Id, "Reset Password", NdEmailService.CreateResetPasswordBody(callbackUrl.ToString()));
+            }
+            catch (Exception ex)
+            {
+                NdLogger.Error(string.Format("Error sending ResetPassword email for user [email: {0}]", email), ex);
+                return InternalServerError();
+            }
+
+            return Ok();
+        }
+
         [Authorize(Roles = "DevAdmin")]
         [Route("user/{id:guid}")]
         [HttpDelete]
@@ -304,6 +349,63 @@ namespace RS.NetDiet.Therapist.Api.Controllers
                     "Model state is not valid [ModelState: {0}]",
                     string.Join(Environment.NewLine, ModelState.Select(x => string.Format("{0}: {1}", x.Key, x.Value)))));
                 return BadRequest(ModelState);
+            }
+
+            return Ok();
+        }
+
+        [Authorize(Roles = "DevAdmin, Admin, Therapist")]
+        [Route("update")]
+        [HttpPost]
+        public async Task<IHttpActionResult> UpdateMyInfo(MyInfoDto myInfoDto)
+        {
+            NdLogger.Debug("Begin");
+            var id = User.Identity.GetUserId();
+            var user = await NdUserManager.FindByIdAsync(id);
+            var emailChanged = false;
+
+            if (!string.IsNullOrWhiteSpace(myInfoDto.Clinic) && !user.Clinic.Equals(myInfoDto.Clinic))
+                user.Clinic = myInfoDto.Clinic;
+            if (!string.IsNullOrWhiteSpace(myInfoDto.Email) && !user.Email.Equals(myInfoDto.Email))
+            {
+                emailChanged = true;
+                user.EmailConfirmed = false;
+                user.Email = myInfoDto.Email;
+            }
+            if (!string.IsNullOrWhiteSpace(myInfoDto.FirstName) && !user.FirstName.Equals(myInfoDto.FirstName))
+                user.FirstName = myInfoDto.FirstName;
+            if (myInfoDto.Gender.HasValue && !user.Gender.Equals(myInfoDto.Gender.Value))
+                user.Gender = myInfoDto.Gender.Value;
+            if (!string.IsNullOrWhiteSpace(myInfoDto.LastName) && !user.LastName.Equals(myInfoDto.LastName))
+                user.LastName = myInfoDto.LastName;
+            if (!string.IsNullOrWhiteSpace(myInfoDto.PhoneNumber) && !user.PhoneNumber.Equals(myInfoDto.PhoneNumber))
+                user.PhoneNumber = myInfoDto.PhoneNumber;
+            if (myInfoDto.Title.HasValue && !user.Title.Equals(myInfoDto.Title.Value))
+                user.Title = myInfoDto.Title.Value;
+
+            var result = await NdUserManager.UpdateAsync(user);
+            if (!result.Succeeded)
+            {
+                NdLogger.Error(string.Format(
+                    "Update user info failed [email: {0}, Reason: {1}]",
+                    user.Email,
+                    string.Join(Environment.NewLine, result.Errors)));
+                return GetErrorResult(result);
+            }
+            await NdDbContext.SaveChangesAsync();
+
+            if (emailChanged)
+            {
+                try
+                {
+                    string code = await NdUserManager.GenerateEmailConfirmationTokenAsync(user.Id);
+                    var callbackUrl = new Uri(Url.Link("ConfirmEmailRoute", new { userId = user.Id, code = code }));
+                    await NdUserManager.SendEmailAsync(user.Id, "Confirm your account", NdEmailService.CreateConfirmEmailBody(callbackUrl.ToString()));
+                }
+                catch (Exception ex)
+                {
+                    NdLogger.Error(string.Format("Error sending ConfirmEmail email for therapist [email: {0}]", user.Email), ex);
+                }
             }
 
             return Ok();

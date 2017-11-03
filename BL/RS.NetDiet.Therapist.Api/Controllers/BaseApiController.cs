@@ -12,6 +12,7 @@ namespace RS.NetDiet.Therapist.Api.Controllers
         private Factory _factory;
         private NdUserManager _ndUserManager = null;
         private NdRoleManager _ndRoleManager = null;
+        private NdDbContext _ndDbContext = null;
 
         protected NdUserManager NdUserManager
         {
@@ -26,6 +27,14 @@ namespace RS.NetDiet.Therapist.Api.Controllers
             get
             {
                 return _ndRoleManager ?? Request.GetOwinContext().GetUserManager<NdRoleManager>();
+            }
+        }
+
+        protected NdDbContext NdDbContext
+        {
+            get
+            {
+                return _ndDbContext ?? Request.GetOwinContext().Get<NdDbContext>();
             }
         }
 
