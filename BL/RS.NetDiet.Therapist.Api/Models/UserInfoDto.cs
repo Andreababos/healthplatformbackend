@@ -4,7 +4,7 @@
     {
         public string Id { get; set; }
 
-        public Title Title { get; set; }
+        public Title? Title { get; set; }
 
         public string FirstName { get; set; }
 
@@ -14,7 +14,7 @@
 
         public string Clinic { get; set; }
 
-        public Gender Gender { get; set; }
+        public Gender? Gender { get; set; }
 
         public string PhoneNumber { get; set; }
     }

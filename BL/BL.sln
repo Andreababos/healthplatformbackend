@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RS.NetDiet.Therapist.Api", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RS.NetDiet.Therapist.DataModel", "RS.NetDiet.Therapist.DataModel\RS.NetDiet.Therapist.DataModel.csproj", "{B3A6195A-A734-47B2-B159-91F26EC966F7}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{34413218-B5E8-40D2-AF72-7F3FF99E1221}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Base|Any CPU = Base|Any CPU

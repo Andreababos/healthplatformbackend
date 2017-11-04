@@ -148,8 +148,8 @@ namespace RS.NetDiet.Therapist.Api.Controllers
         }
 
         [AllowAnonymous]
+        [Route("confirmemail")]
         [HttpGet]
-        [Route("confirmemail", Name = "ConfirmEmailRoute")]
         public async Task<IHttpActionResult> ConfirmEmail(string userId = "", string code = "")
         {
             if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(code))
@@ -171,6 +171,35 @@ namespace RS.NetDiet.Therapist.Api.Controllers
                 NdLogger.Error(string.Format(
                     "Confirm email failed [id: {0}, code: {1}, Reason: {2}]",
                     userId, code,
+                    string.Join(Environment.NewLine, result.Errors)));
+                return GetErrorResult(result);
+            }
+        }
+
+        [AllowAnonymous]
+        [Route("resetpassword")]
+        [HttpPost]
+        public async Task<IHttpActionResult> ResetPassword(ResetPasswordDto resetPasswordDto)
+        {
+            NdLogger.Debug("Begin");
+            if (!ModelState.IsValid)
+            {
+                NdLogger.Error(string.Format(
+                    "Model state is not valid [ModelState: {0}]",
+                    string.Join(Environment.NewLine, ModelState.Select(x => string.Format("{0}: {1}", x.Key, x.Value)))));
+                return BadRequest(ModelState);
+            }
+
+            IdentityResult result = await NdUserManager.ResetPasswordAsync(resetPasswordDto.Id, resetPasswordDto.Code, resetPasswordDto.Password);
+            if (result.Succeeded)
+            {
+                return Ok();
+            }
+            else
+            {
+                NdLogger.Error(string.Format(
+                    "Reset password failed [id: {0}, code: {1}, password: {2}, Reason: {3}]",
+                    resetPasswordDto.Id, resetPasswordDto.Code, resetPasswordDto.Password, 
                     string.Join(Environment.NewLine, result.Errors)));
                 return GetErrorResult(result);
             }
@@ -357,7 +386,7 @@ namespace RS.NetDiet.Therapist.Api.Controllers
         [Authorize(Roles = "DevAdmin, Admin, Therapist")]
         [Route("update")]
         [HttpPost]
-        public async Task<IHttpActionResult> UpdateMyInfo(MyInfoDto myInfoDto)
+        public async Task<IHttpActionResult> UpdateMyInfo(UserInfoDto myInfoDto)
         {
             NdLogger.Debug("Begin");
             var id = User.Identity.GetUserId();

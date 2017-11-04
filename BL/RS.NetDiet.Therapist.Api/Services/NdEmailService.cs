@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.IO;
+using RS.NetDiet.Therapist.Api.Models;
 
 namespace RS.NetDiet.Therapist.Api.Services
 {
@@ -67,6 +68,22 @@ namespace RS.NetDiet.Therapist.Api.Services
         public static string CreateResetPasswordBody(string callbackUrl)
         {
             var body = CreateEmailBody(ConfigurationManager.AppSettings["emailTemplates:ResetPassword"], new Dictionary<string, string>() { { "callbackUrl", callbackUrl } });
+
+            return body;
+        }
+
+        public static string CreateAccountInformationChangedBody(UserInfoDto userInfoDto)
+        {
+            var body = CreateEmailBody(ConfigurationManager.AppSettings["emailTemplates:AccountInformationChanged"], new Dictionary<string, string>()
+            {
+                { "clinic", userInfoDto.Clinic },
+                { "email", userInfoDto.Email },
+                { "firstName", userInfoDto.FirstName },
+                { "gender", userInfoDto.Gender.ToString() },
+                { "lastName", userInfoDto.LastName },
+                { "phoneNumber", userInfoDto.PhoneNumber },
+                { "title", userInfoDto.Title.ToString() }
+            });
 
             return body;
         }
