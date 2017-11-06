@@ -72,6 +72,13 @@ namespace RS.NetDiet.Therapist.Api.Services
             return body;
         }
 
+        public static string CreatePasswordResetedBody()
+        {
+            var body = CreateEmailBody(ConfigurationManager.AppSettings["emailTemplates:PasswordReseted"]);
+
+            return body;
+        }
+
         public static string CreateAccountInformationChangedBody(UserInfoDto userInfoDto)
         {
             var body = CreateEmailBody(ConfigurationManager.AppSettings["emailTemplates:AccountInformationChanged"], new Dictionary<string, string>()

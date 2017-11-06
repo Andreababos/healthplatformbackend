@@ -156,6 +156,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="EmailTemplates\account-information-changed.html" />
+    <Content Include="EmailTemplates\password-reseted.html" />
+    <Content Include="EmailTemplates\reset-password.html" />
+    <Content Include="EmailTemplates\confirm-email-with-password.html" />
     <Content Include="EmailTemplates\confirm-email.html" />
     <Content Include="packages.config" />
     <None Include="Properties\PublishProfiles\File System.pubxml" />

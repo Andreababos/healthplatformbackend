@@ -16,10 +16,10 @@ namespace RS.NetDiet.Therapist.Api.Models
         public string LastName { get; set; }
 
         [Required]
-        public Gender? Gender { get; set; }
+        public Gender Gender { get; set; }
 
         [Required]
-        public Title? Title { get; set; }
+        public Title Title { get; set; }
 
         [Required]
         [Phone]

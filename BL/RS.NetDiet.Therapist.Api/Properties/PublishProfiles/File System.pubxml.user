@@ -100,10 +100,10 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>06/18/2015 20:19:46</publishTime>
     </File>
     <File Include="bin/RS.NetDiet.Therapist.Api.dll">
-      <publishTime>11/03/2017 10:30:14</publishTime>
+      <publishTime>11/06/2017 17:21:53</publishTime>
     </File>
     <File Include="bin/RS.NetDiet.Therapist.DataModel.dll">
-      <publishTime>11/03/2017 10:30:11</publishTime>
+      <publishTime>11/03/2017 22:49:38</publishTime>
     </File>
     <File Include="bin/System.IdentityModel.Tokens.Jwt.dll">
       <publishTime>11/02/2014 16:40:08</publishTime>
@@ -123,8 +123,20 @@ by editing this MSBuild file. In order to learn more about this please visit htt
     <File Include="bin/Thinktecture.IdentityModel.Core.dll">
       <publishTime>02/07/2015 10:32:38</publishTime>
     </File>
+    <File Include="EmailTemplates/account-information-changed.html">
+      <publishTime>11/06/2017 17:15:35</publishTime>
+    </File>
+    <File Include="EmailTemplates/confirm-email-with-password.html">
+      <publishTime>11/05/2017 13:47:27</publishTime>
+    </File>
     <File Include="EmailTemplates/confirm-email.html">
       <publishTime>10/31/2017 19:25:27</publishTime>
+    </File>
+    <File Include="EmailTemplates/password-reseted.html">
+      <publishTime>11/06/2017 17:17:51</publishTime>
+    </File>
+    <File Include="EmailTemplates/reset-password.html">
+      <publishTime>11/06/2017 13:48:11</publishTime>
     </File>
     <File Include="Global.asax">
       <publishTime>10/30/2017 18:49:06</publishTime>
@@ -133,7 +145,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>10/30/2017 18:49:06</publishTime>
     </File>
     <File Include="Web.config">
-      <publishTime>11/03/2017 10:30:14</publishTime>
+      <publishTime>11/06/2017 17:21:54</publishTime>
     </File>
   </ItemGroup>
 </Project>

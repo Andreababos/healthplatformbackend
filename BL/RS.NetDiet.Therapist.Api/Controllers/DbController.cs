@@ -1,4 +1,5 @@
 ﻿using RS.NetDiet.Therapist.DataModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
@@ -13,7 +14,7 @@ namespace RS.NetDiet.Therapist.Api.Controllers
         [HttpPost]
         public IHttpActionResult ExecuteNonQuery(IEnumerable<string> commands)
         {
-            NdLogger.Debug("Begin");
+            NdLogger.Debug(string.Format("Begin. Commands: [{0}]", string.Join(", ", commands)));
             if (commands.Any())
             {
                 int rowsAffected = 0;
@@ -22,9 +23,22 @@ namespace RS.NetDiet.Therapist.Api.Controllers
                     foreach (var command in commands)
                     {
                         NdLogger.Debug(string.Format("Executing command [{0}]", command));
-                        var tmp = executor.NonQuery(command);
-                        rowsAffected += tmp;
-                        NdLogger.Debug(string.Format("Command executed successfully. Rows affected [{0}]", tmp));
+                        if (string.IsNullOrWhiteSpace(command))
+                        {
+                            NdLogger.Error("Command is empty. Skipping it.");
+                            continue;
+                        }
+                        try
+                        {
+                            var tmp = executor.NonQuery(command);
+                            rowsAffected += tmp;
+                            NdLogger.Debug(string.Format("Command executed successfully. Rows affected [{0}]", tmp));
+                        }
+                        catch (Exception ex)
+                        {
+                            NdLogger.Error(string.Format("Error executing command. Command: [{0}]", command), ex);
+                            return InternalServerError(ex);
+                        }
                     }
                 }
 
@@ -32,7 +46,7 @@ namespace RS.NetDiet.Therapist.Api.Controllers
                 return Ok(rowsAffected);
             }
 
-            NdLogger.Warning("Command set is empty");
+            NdLogger.Error("Command set is empty");
             return BadRequest();
         }
 
@@ -41,7 +55,13 @@ namespace RS.NetDiet.Therapist.Api.Controllers
         [HttpPost]
         public IHttpActionResult ExecuteReader([FromBody] string command)
         {
-            NdLogger.Debug("Begin");
+            NdLogger.Debug(string.Format("Begin. Command: [{0}]", command));
+            if (string.IsNullOrWhiteSpace(command))
+            {
+                NdLogger.Error("Command is empty");
+                return BadRequest();
+            }
+
             List<List<Dictionary<string, object>>> data = new List<List<Dictionary<string, object>>>();
             using (var executor = new NdSqlExecutor())
             {
@@ -50,6 +70,7 @@ namespace RS.NetDiet.Therapist.Api.Controllers
                 NdLogger.Debug("Reader executed successfully");
             }
 
+            NdLogger.Debug("Command executed successfully");
             return Ok(data);
         }
     }
