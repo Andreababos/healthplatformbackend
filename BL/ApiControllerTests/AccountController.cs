@@ -20,7 +20,8 @@ namespace ApiControllerTests
         [TestInitialize]
         public void Initialize()
         {
-            client.BaseAddress = new Uri("http://localhost/Therapist/");
+            //client.BaseAddress = new Uri("http://localhost/Therapist/");
+            client.BaseAddress = new Uri("http://therapistapi.mintest.dk/");
 
             var content = new FormUrlEncodedContent(new Dictionary<string, string>()
             {
@@ -37,7 +38,7 @@ namespace ApiControllerTests
             var stringContent = new StringContent(JsonConvert.SerializeObject(new CreateAdminDto()
             {
                 ConfirmPassword = "adminPassw0rd!",
-                Email = "admin@email.com",
+                Email = "tuzitamas@gmail.com",
                 FirstName = "Admin",
                 Gender = Gender.Male,
                 LastName = "User",
@@ -56,6 +57,7 @@ namespace ApiControllerTests
         [TestCleanup]
         public void Cleanup()
         {
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
             var response = client.DeleteAsync(string.Format("api/accounts/user/{0}", adminId)).Result;
             Assert.IsTrue(response.IsSuccessStatusCode);
         }
@@ -96,7 +98,7 @@ namespace ApiControllerTests
             var content = new StringContent(JsonConvert.SerializeObject(new CreateTherapistDto()
             {
                 Clinic = "clinic",
-                Email = "tuzitamas@gmail.com",
+                Email = "test@mintest.dk",
                 FirstName = "Test",
                 Gender = Gender.Male,
                 LastName = "Therapist",
@@ -104,6 +106,11 @@ namespace ApiControllerTests
                 Title = Title.Mr,
             }), Encoding.UTF8, "application/json");
             var response = client.PostAsync("api/accounts/create/therapist", content).Result;
+            Assert.IsTrue(response.IsSuccessStatusCode);
+            var createTherapistResponseData = response.Content.ReadAsAsync<UserReturnDto>().Result;
+            var therapistId = createTherapistResponseData.Id;
+
+            response = client.DeleteAsync(string.Format("api/accounts/user/{0}", therapistId)).Result;
             Assert.IsTrue(response.IsSuccessStatusCode);
         }
 
@@ -123,7 +130,7 @@ namespace ApiControllerTests
         [TestMethod]
         public void ResetPassword()
         {
-            var content = new StringContent("tuzi92@yahoo.com", Encoding.UTF8, "application/json");
+            var content = new StringContent("\"tuzi92@yahoo.com\"", Encoding.UTF8, "application/json");
             var response = client.PostAsync("api/accounts/requestpasswordreset", content).Result;
             Assert.IsTrue(response.IsSuccessStatusCode);
         }
@@ -145,7 +152,7 @@ namespace ApiControllerTests
             var content = new FormUrlEncodedContent(new Dictionary<string, string>()
             {
                 { "grant_type", "password" },
-                { "username", "admin@email.com" },
+                { "username", "tuzitamas@gmail.com" },
                 { "password", "adminPassw0rd!" }
             });
             var response = client.PostAsync("api/oauth/token", content).Result;
@@ -172,7 +179,7 @@ namespace ApiControllerTests
             var content = new FormUrlEncodedContent(new Dictionary<string, string>()
             {
                 { "grant_type", "password" },
-                { "username", "admin@email.com" },
+                { "username", "tuzitamas@gmail.com" },
                 { "password", "adminPassw0rd!" }
             });
             var response = client.PostAsync("api/oauth/token", content).Result;
@@ -182,7 +189,7 @@ namespace ApiControllerTests
 
             var stringContent = new StringContent(JsonConvert.SerializeObject(new UserInfoDto()
             {
-                Email = "adminUser@email.com"
+                Email = "test@mintest.dk"
             }), Encoding.UTF8, "application/json");
             response = client.PostAsync("api/accounts/update", stringContent).Result;
             Assert.IsTrue(response.IsSuccessStatusCode);
@@ -190,7 +197,7 @@ namespace ApiControllerTests
             response = client.GetAsync("api/accounts/info").Result;
             Assert.IsTrue(response.IsSuccessStatusCode);
             var getMyInfoResponseData = response.Content.ReadAsAsync<UserInfoDto>().Result;
-            Assert.AreEqual("adminUser@email.com", getMyInfoResponseData.Email);
+            Assert.AreEqual("test@mintest.dk", getMyInfoResponseData.Email);
         }
     }
 }

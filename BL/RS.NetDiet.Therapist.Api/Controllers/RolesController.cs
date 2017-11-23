@@ -19,7 +19,7 @@ namespace RS.NetDiet.Therapist.Api.Controllers
 
             if (role != null)
             {
-                return Ok(Factory.Create(role));
+                return Ok(_factory.Create(role));
             }
 
             return NotFound();
@@ -53,7 +53,7 @@ namespace RS.NetDiet.Therapist.Api.Controllers
 
             Uri locationHeader = new Uri(Url.Link("GetRoleById", new { id = role.Id }));
 
-            return Created(locationHeader, Factory.Create(role));
+            return Created(locationHeader, _factory.Create(role));
         }
 
         [Route("{id:guid}")]

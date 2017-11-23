@@ -25,5 +25,7 @@ namespace RS.NetDiet.Therapist.DataModel
             throw new UnintentionalCodeFirstException();
         }
     
+        public virtual DbSet<Patient> Patients { get; set; }
+        public virtual DbSet<Result> Results { get; set; }
     }
 }

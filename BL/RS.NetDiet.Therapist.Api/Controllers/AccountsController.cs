@@ -20,8 +20,8 @@ namespace RS.NetDiet.Therapist.Api.Controllers
         [HttpGet]
         public IHttpActionResult GetUsers()
         {
-            NdLogger.Debug("Begin");
-            return Ok(NdUserManager.Users.ToList().Select(u => Factory.Create(u)));
+            _logger.Debug("Begin");
+            return Ok(NdUserManager.Users.ToList().Select(u => _factory.Create(u)));
         }
 
         [Authorize(Roles = "DevAdmin, Admin")]
@@ -29,16 +29,16 @@ namespace RS.NetDiet.Therapist.Api.Controllers
         [HttpGet]
         public async Task<IHttpActionResult> GetUser(string id)
         {
-            NdLogger.Debug(string.Format("Begin. Id: [{0}]", id));
+            _logger.Debug(string.Format("Begin. Id: [{0}]", id));
             var user = await NdUserManager.FindByIdAsync(id);
 
             if (user != null)
             {
-                NdLogger.Debug(string.Format("User found. Id: [{0}]", id));
-                return Ok(Factory.Create(user));
+                _logger.Debug(string.Format("User found. Id: [{0}]", id));
+                return Ok(_factory.Create(user));
             }
 
-            NdLogger.Debug(string.Format("User was not found. Id: [{0}]", id));
+            _logger.Debug(string.Format("User was not found. Id: [{0}]", id));
             return NotFound();
         }
 
@@ -47,17 +47,17 @@ namespace RS.NetDiet.Therapist.Api.Controllers
         [HttpGet]
         public async Task<IHttpActionResult> GetMyInfo()
         {
-            NdLogger.Debug("Begin");
+            _logger.Debug("Begin");
             var id = User.Identity.GetUserId();
             var user = await NdUserManager.FindByIdAsync(id);
 
             if (user != null)
             {
-                NdLogger.Debug(string.Format("User found. Id: [{0}]", id));
-                return Ok(Factory.CreateUserInfo(user));
+                _logger.Debug(string.Format("User found. Id: [{0}]", id));
+                return Ok(_factory.CreateUserInfo(user));
             }
 
-            NdLogger.Debug(string.Format("User was not found. Id: [{0}]", id));
+            _logger.Debug(string.Format("User was not found. Id: [{0}]", id));
             return NotFound();
         }
 
@@ -66,7 +66,7 @@ namespace RS.NetDiet.Therapist.Api.Controllers
         [HttpPost]
         public async Task<IHttpActionResult> CreateTherapist(CreateTherapistDto createTherapistDto)
         {
-            NdLogger.Debug(string.Format("Begin. Clinic: [{0}], Email: [{1}], FirstName: [{2}], Gender: [{3}], LastName: [{4}], PhoneNumber: [{5}], Title: [{6}]", 
+            _logger.Debug(string.Format("Begin. Clinic: [{0}], Email: [{1}], FirstName: [{2}], Gender: [{3}], LastName: [{4}], PhoneNumber: [{5}], Title: [{6}]", 
                 createTherapistDto.Clinic,
                 createTherapistDto.Email,
                 createTherapistDto.FirstName,
@@ -76,7 +76,7 @@ namespace RS.NetDiet.Therapist.Api.Controllers
                 createTherapistDto.Title.ToString()));
             if (!ModelState.IsValid)
             {
-                NdLogger.Error(string.Format(
+                _logger.Error(string.Format(
                     "Model state is not valid. ModelState: [{0}]", 
                     string.Join(Environment.NewLine, ModelState.Select(x => string.Format("{0}: {1}", x.Key, x.Value)))));
                 return BadRequest(ModelState);
@@ -98,7 +98,7 @@ namespace RS.NetDiet.Therapist.Api.Controllers
             IdentityResult addUserResult = await NdUserManager.CreateAsync(user, password);
             if (!addUserResult.Succeeded)
             {
-                NdLogger.Error(string.Format(
+                _logger.Error(string.Format(
                     "Create user failed. Email: [{0}], Reason: [{1}]",
                     createTherapistDto.Email,
                     string.Join(Environment.NewLine, addUserResult.Errors)));
@@ -108,7 +108,7 @@ namespace RS.NetDiet.Therapist.Api.Controllers
             IdentityResult addUserToRoleResult = await NdUserManager.AddToRoleAsync(user.Id, "Therapist");
             if (!addUserToRoleResult.Succeeded)
             {
-                NdLogger.Error(string.Format(
+                _logger.Error(string.Format(
                     "Add user to roles failed. Email: [{0}], Reason: [{1}]",
                     createTherapistDto.Email,
                     string.Join(Environment.NewLine, addUserResult.Errors)));
@@ -121,7 +121,7 @@ namespace RS.NetDiet.Therapist.Api.Controllers
             }
             catch(Exception ex)
             {
-                NdLogger.Error(string.Format("Error creating folder for therapist. Email: [{0}]", createTherapistDto.Email), ex);
+                _logger.Error(string.Format("Error creating folder for therapist. Email: [{0}]", createTherapistDto.Email), ex);
                 return InternalServerError(ex);
             }
 
@@ -133,12 +133,12 @@ namespace RS.NetDiet.Therapist.Api.Controllers
             }
             catch (Exception ex)
             {
-                NdLogger.Error(string.Format("Error sending ConfirmEmail email for therapist. Email: [{0}]", createTherapistDto.Email), ex);
+                _logger.Error(string.Format("Error sending ConfirmEmail email for therapist. Email: [{0}]", createTherapistDto.Email), ex);
                 return InternalServerError(ex);
             }
 
             Uri locationHeader = new Uri(Url.Link("GetUserById", new { id = user.Id }));
-            return Created(locationHeader, Factory.Create(user));
+            return Created(locationHeader, _factory.Create(user));
         }
 
         [AllowAnonymous]
@@ -146,11 +146,11 @@ namespace RS.NetDiet.Therapist.Api.Controllers
         [HttpGet]
         public async Task<IHttpActionResult> ConfirmEmail(string userId = "", string code = "")
         {
-            NdLogger.Debug(string.Format("Begin. UserId: [{0}], Code: [{1}]"));
+            _logger.Debug(string.Format("Begin. UserId: [{0}], Code: [{1}]"));
             if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(code))
             {
                 ModelState.AddModelError("", "User Id and Code are required");
-                NdLogger.Error(string.Format(
+                _logger.Error(string.Format(
                     "Model state is not valid. ModelState: [{0}]",
                     string.Join(Environment.NewLine, ModelState.Select(x => string.Format("{0}: {1}", x.Key, x.Value)))));
                 return BadRequest(ModelState);
@@ -159,12 +159,12 @@ namespace RS.NetDiet.Therapist.Api.Controllers
             IdentityResult result = await NdUserManager.ConfirmEmailAsync(userId, code);
             if (result.Succeeded)
             {
-                NdLogger.Debug(string.Format("Email confirmed successfully. Id: [{0}]", userId));
+                _logger.Debug(string.Format("Email confirmed successfully. Id: [{0}]", userId));
                 return Ok();
             }
             else
             {
-                NdLogger.Error(string.Format(
+                _logger.Error(string.Format(
                     "Confirm email failed. Id: [{0}], Code: [{1}], Reason: [{2}]",
                     userId, code,
                     string.Join(Environment.NewLine, result.Errors)));
@@ -177,12 +177,12 @@ namespace RS.NetDiet.Therapist.Api.Controllers
         [HttpPost]
         public async Task<IHttpActionResult> ResetPassword(ResetPasswordDto resetPasswordDto)
         {
-            NdLogger.Debug(string.Format("Begin. Code: [{0}], Id: [{1}]",
+            _logger.Debug(string.Format("Begin. Code: [{0}], Id: [{1}]",
                 resetPasswordDto.Code,
                 resetPasswordDto.Id));
             if (!ModelState.IsValid)
             {
-                NdLogger.Error(string.Format(
+                _logger.Error(string.Format(
                     "Model state is not valid. ModelState: [{0}]",
                     string.Join(Environment.NewLine, ModelState.Select(x => string.Format("{0}: {1}", x.Key, x.Value)))));
                 return BadRequest(ModelState);
@@ -191,7 +191,7 @@ namespace RS.NetDiet.Therapist.Api.Controllers
             IdentityResult result = await NdUserManager.ResetPasswordAsync(resetPasswordDto.Id, resetPasswordDto.Code, resetPasswordDto.Password);
             if (result.Succeeded)
             {
-                NdLogger.Debug(string.Format("Password reseted successfully. Id: [{0}]", resetPasswordDto.Id));
+                _logger.Debug(string.Format("Password reseted successfully. Id: [{0}]", resetPasswordDto.Id));
 
                 try
                 {
@@ -199,7 +199,7 @@ namespace RS.NetDiet.Therapist.Api.Controllers
                 }
                 catch (Exception ex)
                 {
-                    NdLogger.Error(string.Format("Error sending PasswordReseted email. Id: [{0}]", resetPasswordDto.Id), ex);
+                    _logger.Error(string.Format("Error sending PasswordReseted email. Id: [{0}]", resetPasswordDto.Id), ex);
                     return InternalServerError(ex);
                 }
 
@@ -207,7 +207,7 @@ namespace RS.NetDiet.Therapist.Api.Controllers
             }
             else
             {
-                NdLogger.Error(string.Format(
+                _logger.Error(string.Format(
                     "Reset password failed. Id: [{0}], Code: [{1}], Reason: [{2}]",
                     resetPasswordDto.Id, resetPasswordDto.Code, 
                     string.Join(Environment.NewLine, result.Errors)));
@@ -220,7 +220,7 @@ namespace RS.NetDiet.Therapist.Api.Controllers
         [HttpPost]
         public async Task<IHttpActionResult> CreateAdmin(CreateAdminDto createAdminDto)
         {
-            NdLogger.Debug(string.Format("Begin. Email: [{0}], FirstName: [{1}], Gender: [{2}], LastName: [{3}], PhoneNumber: [{4}], Title: [{5}], UserName: [{6}]", 
+            _logger.Debug(string.Format("Begin. Email: [{0}], FirstName: [{1}], Gender: [{2}], LastName: [{3}], PhoneNumber: [{4}], Title: [{5}], UserName: [{6}]", 
                 createAdminDto.Email,
                 createAdminDto.FirstName,
                 createAdminDto.Gender.ToString(),
@@ -230,7 +230,7 @@ namespace RS.NetDiet.Therapist.Api.Controllers
                 createAdminDto.UserName));
             if (!ModelState.IsValid)
             {
-                NdLogger.Error(string.Format(
+                _logger.Error(string.Format(
                     "Model state is not valid. ModelState: [{0}]",
                     string.Join(Environment.NewLine, ModelState.Select(x => string.Format("{0}: {1}", x.Key, x.Value)))));
                 return BadRequest(ModelState);
@@ -252,7 +252,7 @@ namespace RS.NetDiet.Therapist.Api.Controllers
             IdentityResult addUserResult = await NdUserManager.CreateAsync(user, createAdminDto.Password);
             if (!addUserResult.Succeeded)
             {
-                NdLogger.Error(string.Format(
+                _logger.Error(string.Format(
                     "Create admin failed. Email: [{0}], Reason: [{1}]",
                     createAdminDto.Email,
                     string.Join(Environment.NewLine, addUserResult.Errors)));
@@ -262,7 +262,7 @@ namespace RS.NetDiet.Therapist.Api.Controllers
             IdentityResult addUserToRoleResult = await NdUserManager.AddToRoleAsync(user.Id, "Admin");
             if (!addUserToRoleResult.Succeeded)
             {
-                NdLogger.Error(string.Format(
+                _logger.Error(string.Format(
                     "Add admin to roles failed. Email: [{0}], Reason: [{1}]",
                     createAdminDto.Email,
                     string.Join(Environment.NewLine, addUserResult.Errors)));
@@ -270,8 +270,8 @@ namespace RS.NetDiet.Therapist.Api.Controllers
             }
 
             Uri locationHeader = new Uri(Url.Link("GetUserById", new { id = user.Id }));
-            NdLogger.Debug(string.Format("Admin created successfully. Email: [{0}]", createAdminDto.Email));
-            return Created(locationHeader, Factory.Create(user));
+            _logger.Debug(string.Format("Admin created successfully. Email: [{0}]", createAdminDto.Email));
+            return Created(locationHeader, _factory.Create(user));
         }
 
         [Authorize(Roles = "DevAdmin, Admin, Therapist")]
@@ -279,10 +279,10 @@ namespace RS.NetDiet.Therapist.Api.Controllers
         [HttpPost]
         public async Task<IHttpActionResult> ChangePassword(ChangePasswordDto changePasswordDto)
         {
-            NdLogger.Debug("Begin");
+            _logger.Debug("Begin");
             if (!ModelState.IsValid)
             {
-                NdLogger.Error(string.Format(
+                _logger.Error(string.Format(
                     "Model state is not valid. ModelState: [{0}]",
                     string.Join(Environment.NewLine, ModelState.Select(x => string.Format("{0}: {1}", x.Key, x.Value)))));
                 return BadRequest(ModelState);
@@ -292,14 +292,14 @@ namespace RS.NetDiet.Therapist.Api.Controllers
             IdentityResult result = await NdUserManager.ChangePasswordAsync(id, changePasswordDto.OldPassword, changePasswordDto.NewPassword);
             if (!result.Succeeded)
             {
-                NdLogger.Error(string.Format(
+                _logger.Error(string.Format(
                     "Change password failed. Id: [{0}], Reason: [{1}]",
                     User.Identity.GetUserId(),
                     string.Join(Environment.NewLine, result.Errors)));
                 return GetErrorResult(result);
             }
 
-            NdLogger.Debug(string.Format("Password changed successfully. Id: [{0}]", id));
+            _logger.Debug(string.Format("Password changed successfully. Id: [{0}]", id));
             return Ok();
         }
 
@@ -308,10 +308,11 @@ namespace RS.NetDiet.Therapist.Api.Controllers
         [HttpPost]
         public async Task<IHttpActionResult> RequestPasswordReset([FromBody] string email)
         {
+            _logger.Debug(string.Format("Begin. Email: [{0}]", email));
             var user = await NdUserManager.FindByEmailAsync(email);
             if (user == null)
             {
-                NdLogger.Debug(string.Format("User was not found. Email: [{0}]", email));
+                _logger.Debug(string.Format("User was not found. Email: [{0}]", email));
                 return NotFound();
             }
 
@@ -323,11 +324,11 @@ namespace RS.NetDiet.Therapist.Api.Controllers
             }
             catch (Exception ex)
             {
-                NdLogger.Error(string.Format("Error sending ResetPassword email for user. Email: [{0}]", email), ex);
+                _logger.Error(string.Format("Error sending ResetPassword email for user. Email: [{0}]", email), ex);
                 return InternalServerError(ex);
             }
 
-            NdLogger.Debug(string.Format("Reset password email sent succeessfully. Email: [{0}]", email));
+            _logger.Debug(string.Format("Reset password email sent succeessfully. Email: [{0}]", email));
             return Ok();
         }
 
@@ -336,7 +337,7 @@ namespace RS.NetDiet.Therapist.Api.Controllers
         [HttpDelete]
         public async Task<IHttpActionResult> DeleteUser(string id)
         {
-            NdLogger.Debug(string.Format("Begin. Id: [{0}]", id));
+            _logger.Debug(string.Format("Begin. Id: [{0}]", id));
             var ndUser = await NdUserManager.FindByIdAsync(id);
 
             if (ndUser != null)
@@ -344,18 +345,18 @@ namespace RS.NetDiet.Therapist.Api.Controllers
                 IdentityResult result = await NdUserManager.DeleteAsync(ndUser);
                 if (!result.Succeeded)
                 {
-                    NdLogger.Error(string.Format(
+                    _logger.Error(string.Format(
                         "Delete user failed. Id: [{0}], Reason: [{1}]",
                         id,
                         string.Join(Environment.NewLine, result.Errors)));
                     return GetErrorResult(result);
                 }
 
-                NdLogger.Debug(string.Format("User deleted successfully. Id: [{0}]", id));
+                _logger.Debug(string.Format("User deleted successfully. Id: [{0}]", id));
                 return Ok();
             }
 
-            NdLogger.Debug(string.Format("User was not found [id: {0}]", id));
+            _logger.Debug(string.Format("User was not found [id: {0}]", id));
             return NotFound();
         }
 
@@ -364,12 +365,12 @@ namespace RS.NetDiet.Therapist.Api.Controllers
         [HttpPost]
         public async Task<IHttpActionResult> AssignRolesToUser([FromUri] string id, [FromBody] string[] rolesToAssign)
         {
-            NdLogger.Debug(string.Format("Begin. Id: [{0}], Roles: [{1}]", id, string.Join(", ", rolesToAssign)));
+            _logger.Debug(string.Format("Begin. Id: [{0}], Roles: [{1}]", id, string.Join(", ", rolesToAssign)));
             var ndUser = await NdUserManager.FindByIdAsync(id);
 
             if (ndUser == null)
             {
-                NdLogger.Debug(string.Format("User was not found. Id: [{0}]", id));
+                _logger.Debug(string.Format("User was not found. Id: [{0}]", id));
                 return NotFound();
             }
 
@@ -378,7 +379,7 @@ namespace RS.NetDiet.Therapist.Api.Controllers
             if (rolesNotExists.Count() > 0)
             {
                 ModelState.AddModelError("", string.Format("Roles '{0}' does not exixts in the system", string.Join(",", rolesNotExists)));
-                NdLogger.Error(string.Format(
+                _logger.Error(string.Format(
                     "Model state is not valid. ModelState: [{0}]",
                     string.Join(Environment.NewLine, ModelState.Select(x => string.Format("{0}: {1}", x.Key, x.Value)))));
                 return BadRequest(ModelState);
@@ -388,7 +389,7 @@ namespace RS.NetDiet.Therapist.Api.Controllers
             if (!removeResult.Succeeded)
             {
                 ModelState.AddModelError("", "Failed to remove user roles");
-                NdLogger.Error(string.Format(
+                _logger.Error(string.Format(
                     "Model state is not valid. ModelState: [{0}]",
                     string.Join(Environment.NewLine, ModelState.Select(x => string.Format("{0}: {1}", x.Key, x.Value)))));
                 return BadRequest(ModelState);
@@ -398,13 +399,13 @@ namespace RS.NetDiet.Therapist.Api.Controllers
             if (!addResult.Succeeded)
             {
                 ModelState.AddModelError("", "Failed to add user roles");
-                NdLogger.Error(string.Format(
+                _logger.Error(string.Format(
                     "Model state is not valid [ModelState: {0}]",
                     string.Join(Environment.NewLine, ModelState.Select(x => string.Format("{0}: {1}", x.Key, x.Value)))));
                 return BadRequest(ModelState);
             }
 
-            NdLogger.Debug(string.Format("User assigned to roles successfully. Id: [{0}], Roles: [{1}]", id, string.Join(", ", rolesToAssign)));
+            _logger.Debug(string.Format("User assigned to roles successfully. Id: [{0}], Roles: [{1}]", id, string.Join(", ", rolesToAssign)));
             return Ok();
         }
 
@@ -413,7 +414,7 @@ namespace RS.NetDiet.Therapist.Api.Controllers
         [HttpPost]
         public async Task<IHttpActionResult> UpdateMyInfo(UserInfoDto myInfoDto)
         {
-            NdLogger.Debug(string.Format("Begin. Clinic: [{0}], Email: [{1}], FirstName: [{2}], Gender: [{3}], LastName: [{4}], PhoneNumber: [{5}], Title: [{6}]",
+            _logger.Debug(string.Format("Begin. Clinic: [{0}], Email: [{1}], FirstName: [{2}], Gender: [{3}], LastName: [{4}], PhoneNumber: [{5}], Title: [{6}]",
                 myInfoDto.Clinic,
                 myInfoDto.Email,
                 myInfoDto.FirstName,
@@ -448,14 +449,14 @@ namespace RS.NetDiet.Therapist.Api.Controllers
             }
             catch (Exception ex)
             {
-                NdLogger.Error(string.Format("Update my info failed. Id: [{0}]", id), ex);
+                _logger.Error(string.Format("Update my info failed. Id: [{0}]", id), ex);
                 return InternalServerError(ex);
             }
 
             var result = await NdUserManager.UpdateAsync(user);
             if (!result.Succeeded)
             {
-                NdLogger.Error(string.Format(
+                _logger.Error(string.Format(
                     "Update my info failed. Email: [{0}], Reason: [{1}]",
                     user.Email,
                     string.Join(Environment.NewLine, result.Errors)));
@@ -465,11 +466,11 @@ namespace RS.NetDiet.Therapist.Api.Controllers
 
             try
             {
-                await NdUserManager.SendEmailAsync(id, "Account Information Chaged", NdEmailService.CreateAccountInformationChangedBody(Factory.CreateUserInfo(user)));
+                await NdUserManager.SendEmailAsync(id, "Account Information Chaged", NdEmailService.CreateAccountInformationChangedBody(_factory.CreateUserInfo(user)));
             }
             catch (Exception ex)
             {
-                NdLogger.Error(string.Format("Error sending AccountInformationChanged email. Email: [{0}]", user.Email), ex);
+                _logger.Error(string.Format("Error sending AccountInformationChanged email. Email: [{0}]", user.Email), ex);
                 return InternalServerError(ex);
             }
 
@@ -483,12 +484,12 @@ namespace RS.NetDiet.Therapist.Api.Controllers
                 }
                 catch (Exception ex)
                 {
-                    NdLogger.Error(string.Format("Error sending ConfirmEmail email. Email: {0}]", user.Email), ex);
+                    _logger.Error(string.Format("Error sending ConfirmEmail email. Email: {0}]", user.Email), ex);
                     return InternalServerError(ex);
                 }
             }
 
-            NdLogger.Debug(string.Format("My info updated. Id: [{0}]", id));
+            _logger.Debug(string.Format("My info updated. Id: [{0}]", id));
             return Ok();
         }
     }

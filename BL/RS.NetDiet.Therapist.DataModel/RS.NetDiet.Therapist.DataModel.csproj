@@ -56,6 +56,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DTOs\FileInfoDto.cs" />
     <Compile Include="NdDataModel.Context.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -71,9 +72,17 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>NdDataModel.edmx</DependentUpon>
     </Compile>
-    <Compile Include="NdLogger.cs" />
+    <Compile Include="ILogger.cs" />
     <Compile Include="NdSqlExecutor.cs" />
+    <Compile Include="Patient.cs">
+      <DependentUpon>NdDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="PatientsRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Result.cs">
+      <DependentUpon>NdDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultsRepository.cs" />
   </ItemGroup>
   <ItemGroup>
     <EntityDeploy Include="NdDataModel.edmx">

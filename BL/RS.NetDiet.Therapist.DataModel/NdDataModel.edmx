@@ -4,22 +4,130 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="RS.NetDiet.Therapist.DataModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="RS.NetDiet.Therapist.DataModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Patients">
+          <Key>
+            <PropertyRef Name="PK" />
+          </Key>
+          <Property Name="PK" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TherapistId" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="Title" Type="int" />
+          <Property Name="FirstName" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="LastName" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="Email" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="Gender" Type="int" Nullable="false" />
+          <Property Name="Birthday" Type="date" Nullable="false" />
+          <Property Name="PhoneNumber" Type="nvarchar" MaxLength="128" />
+        </EntityType>
+        <EntityType Name="Results">
+          <Key>
+            <PropertyRef Name="PK" />
+          </Key>
+          <Property Name="PK" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="PatientPK" Type="bigint" Nullable="false" />
+          <Property Name="OriginalFileName" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="GeneratedFileName" Type="nvarchar" MaxLength="128" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_Results_Patients">
+          <End Role="Patients" Type="Self.Patients" Multiplicity="1" />
+          <End Role="Results" Type="Self.Results" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Patients">
+              <PropertyRef Name="PK" />
+            </Principal>
+            <Dependent Role="Results">
+              <PropertyRef Name="PatientPK" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <EntityContainer Name="RSNetDietTherapistDataModelStoreContainer">
+          <EntitySet Name="Patients" EntityType="Self.Patients" Schema="the" store:Type="Tables" />
+          <EntitySet Name="Results" EntityType="Self.Results" Schema="the" store:Type="Tables" />
+          <AssociationSet Name="FK_Results_Patients" Association="Self.FK_Results_Patients">
+            <End Role="Patients" EntitySet="Patients" />
+            <End Role="Results" EntitySet="Results" />
+          </AssociationSet>
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="RS.NetDiet.Therapist.DataModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
         <EntityContainer Name="NdEdModel" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Patients" EntityType="RS.NetDiet.Therapist.DataModel.Patient" />
+          <EntitySet Name="Results" EntityType="RS.NetDiet.Therapist.DataModel.Result" />
+          <AssociationSet Name="FK_Results_Patients" Association="RS.NetDiet.Therapist.DataModel.FK_Results_Patients">
+            <End Role="Patient" EntitySet="Patients" />
+            <End Role="Result" EntitySet="Results" />
+          </AssociationSet>
         </EntityContainer>
+        <EntityType Name="Patient">
+          <Key>
+            <PropertyRef Name="PK" />
+          </Key>
+          <Property Name="PK" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TherapistId" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="Title" Type="Int32" />
+          <Property Name="FirstName" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="LastName" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="Email" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="Gender" Type="Int32" Nullable="false" />
+          <Property Name="Birthday" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="PhoneNumber" Type="String" MaxLength="128" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Results" Relationship="RS.NetDiet.Therapist.DataModel.FK_Results_Patients" FromRole="Patient" ToRole="Result" />
+        </EntityType>
+        <EntityType Name="Result">
+          <Key>
+            <PropertyRef Name="PK" />
+          </Key>
+          <Property Name="PK" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="PatientPK" Type="Int64" Nullable="false" />
+          <Property Name="OriginalFileName" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="GeneratedFileName" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Patient" Relationship="RS.NetDiet.Therapist.DataModel.FK_Results_Patients" FromRole="Result" ToRole="Patient" />
+        </EntityType>
+        <Association Name="FK_Results_Patients">
+          <End Type="RS.NetDiet.Therapist.DataModel.Patient" Role="Patient" Multiplicity="1" />
+          <End Type="RS.NetDiet.Therapist.DataModel.Result" Role="Result" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Patient">
+              <PropertyRef Name="PK" />
+            </Principal>
+            <Dependent Role="Result">
+              <PropertyRef Name="PatientPK" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
         <EntityContainerMapping StorageEntityContainer="RSNetDietTherapistDataModelStoreContainer" CdmEntityContainer="NdEdModel">
+          <EntitySetMapping Name="Patients">
+            <EntityTypeMapping TypeName="RS.NetDiet.Therapist.DataModel.Patient">
+              <MappingFragment StoreEntitySet="Patients">
+                <ScalarProperty Name="PhoneNumber" ColumnName="PhoneNumber" />
+                <ScalarProperty Name="Birthday" ColumnName="Birthday" />
+                <ScalarProperty Name="Gender" ColumnName="Gender" />
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="LastName" ColumnName="LastName" />
+                <ScalarProperty Name="FirstName" ColumnName="FirstName" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="TherapistId" ColumnName="TherapistId" />
+                <ScalarProperty Name="PK" ColumnName="PK" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Results">
+            <EntityTypeMapping TypeName="RS.NetDiet.Therapist.DataModel.Result">
+              <MappingFragment StoreEntitySet="Results">
+                <ScalarProperty Name="GeneratedFileName" ColumnName="GeneratedFileName" />
+                <ScalarProperty Name="OriginalFileName" ColumnName="OriginalFileName" />
+                <ScalarProperty Name="PatientPK" ColumnName="PatientPK" />
+                <ScalarProperty Name="PK" ColumnName="PK" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

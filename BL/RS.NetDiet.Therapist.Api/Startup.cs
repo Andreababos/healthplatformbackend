@@ -29,8 +29,6 @@ namespace RS.NetDiet.Therapist.Api
 
             app.UseCors(Microsoft.Owin.Cors.CorsOptions.AllowAll);
             app.UseWebApi(httpConfig);
-
-            NdLogger.Configure();
         }
 
         private void ConfigureOAuthTokenGeneration(IAppBuilder app)

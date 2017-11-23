@@ -12,11 +12,14 @@ using System.Linq;
 using System.Web;
 using System.IO;
 using RS.NetDiet.Therapist.Api.Models;
+using RS.NetDiet.Therapist.Api.Providers;
 
 namespace RS.NetDiet.Therapist.Api.Services
 {
     public class NdEmailService : IIdentityMessageService
     {
+        private static ILogger _logger = new LogProvider();
+
         public Task SendAsync(IdentityMessage message)
         {
             var email = new MailMessage(
@@ -41,11 +44,11 @@ namespace RS.NetDiet.Therapist.Api.Services
         {
             if (e.Error != null)
             {
-                NdLogger.Error("Error sending e-mail", e.Error);
+                _logger.Error("Error sending e-mail", e.Error);
             }
             else
             {
-                NdLogger.Debug("E-mail sent successfully");
+                _logger.Debug("E-mail sent successfully");
             }
 
             (sender as SmtpClient).Dispose();
@@ -105,7 +108,7 @@ namespace RS.NetDiet.Therapist.Api.Services
             }
             catch (Exception ex)
             {
-                NdLogger.Error(string.Format("Error reading template [tamplateName: {0}]", templateName), ex);
+                _logger.Error(string.Format("Error reading template [tamplateName: {0}]", templateName), ex);
                 throw ex;
             }
 
