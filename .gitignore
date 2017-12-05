@@ -4,3 +4,4 @@
 **/packages
 **/Deployment
 **/Results
+!Packages/*.dll

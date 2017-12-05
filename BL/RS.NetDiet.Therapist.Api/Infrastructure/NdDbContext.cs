@@ -5,7 +5,7 @@ namespace RS.NetDiet.Therapist.Api.Infrastructure
 {
     public class NdDbContext : IdentityDbContext<NdUser>
     {
-        public NdDbContext() : base("NetDiet", throwIfV1Schema: false)
+        public NdDbContext() : base("NetDiet", false)
         {
             Configuration.ProxyCreationEnabled = false;
             Configuration.LazyLoadingEnabled = false;

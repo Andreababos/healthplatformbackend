@@ -5,18 +5,22 @@ using Microsoft.Owin.Security.Jwt;
 using Microsoft.Owin.Security.OAuth;
 using Newtonsoft.Json.Serialization;
 using Owin;
-using RS.NetDiet.Therapist.Api.Infrastructure;
-using RS.NetDiet.Therapist.Api.Providers;
+using RootSolutions.Common.Logger;
+using RootSolutions.Common.Services;
+using RootSolutions.Common.Web.Infrastructure;
+using RootSolutions.Common.Web.Providers;
+using RootSolutions.NetDiet.Therapist.API.Infrastructure;
 using System;
 using System.Configuration;
 using System.Linq;
 using System.Net.Http.Formatting;
 using System.Web.Http;
 
-namespace RS.NetDiet.Therapist.Api
+namespace RootSolutions.NetDiet.Therapist.API
 {
     public class Startup
     {
+        #region Public Methods --------------------------------------
         public void Configuration(IAppBuilder app)
         {
             HttpConfiguration httpConfig = new HttpConfiguration();
@@ -28,23 +32,26 @@ namespace RS.NetDiet.Therapist.Api
             app.UseCors(Microsoft.Owin.Cors.CorsOptions.AllowAll);
             app.UseWebApi(httpConfig);
         }
+        #endregion --------------------------------------------------
 
+        #region Private Methods -------------------------------------
         private void ConfigureOAuthTokenGeneration(IAppBuilder app)
         {
             app.CreatePerOwinContext(NdDbContext.Create);
-            app.CreatePerOwinContext<NdUserManager>(NdUserManager.Create);
-            app.CreatePerOwinContext<NdRoleManager>(NdRoleManager.Create);
+            app.CreatePerOwinContext<RsUserManagerWithMessageService<NdUser, NdDbContext, NdEmailService>>(
+                RsUserManagerWithMessageService<NdUser, NdDbContext, NdEmailService>.Create);
+            app.CreatePerOwinContext<RsRoleManager<NdUser, NdDbContext>>(RsRoleManager<NdUser, NdDbContext>.Create);
 
             OAuthAuthorizationServerOptions OAuthServerOptions = new OAuthAuthorizationServerOptions()
             {
                 AllowInsecureHttp = true,
-                TokenEndpointPath = new PathString("/api/oauth/token"),
+                TokenEndpointPath = new PathString("/oauth/token"),
                 AccessTokenExpireTimeSpan = TimeSpan.FromDays(1),
-                Provider = new NdOAuthProvider(),
+                Provider = new RsOAuthProvider<NdUser, RsUserManagerWithMessageService<NdUser, NdDbContext, NdEmailService>>(new DefaultLogger()),
 #if DEBUG
-                AccessTokenFormat = new NdJwtFormat("http://localhost/NetDiet/Therapist")
+                AccessTokenFormat = new RsJwtFormatProvider("http://localhost/NetDiet/Therapist")
 #else
-                AccessTokenFormat = new NdJwtFormat("http://therapistapi.mintest.dk/")
+                AccessTokenFormat = new NdJwtFormat("http://mintest.dk/")
 #endif
             };
 
@@ -56,11 +63,11 @@ namespace RS.NetDiet.Therapist.Api
 #if DEBUG
             var issuer = "http://localhost/NetDiet/Therapist";
 #else
-            var issuer = "http://therapistapi.mintest.dk/";
+            var issuer = "http://mintest.dk/";
 #endif
             string audienceId = ConfigurationManager.AppSettings["as:AudienceId"];
             byte[] audienceSecret = TextEncodings.Base64Url.Decode(ConfigurationManager.AppSettings["as:AudienceSecret"]);
-            
+
             app.UseJwtBearerAuthentication(
                 new JwtBearerAuthenticationOptions
                 {
@@ -80,5 +87,6 @@ namespace RS.NetDiet.Therapist.Api
             var jsonFormatter = config.Formatters.OfType<JsonMediaTypeFormatter>().First();
             jsonFormatter.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
         }
+        #endregion --------------------------------------------------
     }
 }

@@ -1,5 +1,4 @@
-﻿using log4net;
-using System;
+﻿using System;
 using System.Runtime.CompilerServices;
 
 namespace RS.NetDiet.Therapist.DataModel
