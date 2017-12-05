@@ -106,27 +106,27 @@
     </Reference>
     <Reference Include="RootSolutions.Common.Configuration, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Packages\RootSolutions.Common.Configuration.dll</HintPath>
+      <HintPath>..\..\References\RootSolutions.Common.Configuration.dll</HintPath>
     </Reference>
     <Reference Include="RootSolutions.Common.Logger, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Packages\RootSolutions.Common.Logger.dll</HintPath>
+      <HintPath>..\..\References\RootSolutions.Common.Logger.dll</HintPath>
     </Reference>
     <Reference Include="RootSolutions.Common.Services, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Packages\RootSolutions.Common.Services.dll</HintPath>
+      <HintPath>..\..\References\RootSolutions.Common.Services.dll</HintPath>
     </Reference>
     <Reference Include="RootSolutions.Common.Web.Controllers, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Packages\RootSolutions.Common.Web.Controllers.dll</HintPath>
+      <HintPath>..\..\References\RootSolutions.Common.Web.Controllers.dll</HintPath>
     </Reference>
     <Reference Include="RootSolutions.Common.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Packages\RootSolutions.Common.Web.Infrastructure.dll</HintPath>
+      <HintPath>..\..\References\RootSolutions.Common.Web.Infrastructure.dll</HintPath>
     </Reference>
     <Reference Include="RootSolutions.Common.Web.Providers, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Packages\RootSolutions.Common.Web.Providers.dll</HintPath>
+      <HintPath>..\..\References\RootSolutions.Common.Web.Providers.dll</HintPath>
     </Reference>
     <Reference Include="System.IdentityModel.Tokens.Jwt, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\System.IdentityModel.Tokens.Jwt.4.0.0\lib\net45\System.IdentityModel.Tokens.Jwt.dll</HintPath>
