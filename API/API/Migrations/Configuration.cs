@@ -17,10 +17,15 @@ namespace RootSolutions.NetDiet.Therapist.API.Migrations
 
         protected override void Seed(NdDbContext context)
         {
-            var userManager = new UserManager<NdUser>(new UserStore<NdUser>(new NdDbContext()));
             var roleManager = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(new NdDbContext()));
+            foreach (var role in Enum.GetNames(typeof(Role)))
+            {
+                if (!roleManager.Roles.Any(x => x.Name == role)) { roleManager.Create(new IdentityRole { Name = role }); }
+            }
 
-            var user = new NdUser()
+            var userManager = new UserManager<NdUser>(new UserStore<NdUser>(new NdDbContext()));
+
+            var devAdmin = new NdUser()
             {
                 Email = "devadmin@mintest.dk",
                 EmailConfirmed = true,
@@ -31,15 +36,8 @@ namespace RootSolutions.NetDiet.Therapist.API.Migrations
                 Title = Title.Mr,
                 UserName = "devadmin"
             };
-            userManager.Create(user, "j9up1uuU!");
-
-            foreach (var role in Enum.GetNames(typeof(Role)))
-            {
-                if (!roleManager.Roles.Any(x => x.Name == role)) { roleManager.Create(new IdentityRole { Name = role }); }
-            }
-
-            var devAdminUser = userManager.FindByName("devadmin");
-            userManager.AddToRoles(devAdminUser.Id, Role.DevAdmin.ToString());
+            userManager.Create(devAdmin, "j9up1uuU!");
+            userManager.AddToRoles(devAdmin.Id, Role.DevAdmin.ToString());
         }
     }
 }

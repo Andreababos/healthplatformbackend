@@ -1,22 +1,21 @@
 ﻿using RootSolutions.Common.Logger;
-using RootSolutions.Common.Services;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Web;
 
-namespace RootSolutions.NetDiet.Therapist.API
+namespace RootSolutions.NetDiet.Therapist.API.Providers
 {
-    public class NdEmailService : EmailService
+    public static class NdEmailTemplateProvider
     {
-        #region Constructors ----------------------------------------
-        public NdEmailService() : base(new DefaultLogger())
-        { }
+        #region Private Fields --------------------------------------
+        private static ILogger _logger = new DefaultLogger();
         #endregion --------------------------------------------------
 
         #region Private Methods -------------------------------------
-        private string CreateEmailBody(string templateName, Dictionary<string, string> templateData = null)
+        private static string CreateEmailBody(string templateName, Dictionary<string, string> templateData = null)
         {
             string content = "";
 
@@ -39,6 +38,15 @@ namespace RootSolutions.NetDiet.Therapist.API
             }
 
             return content;
+        }
+        #endregion --------------------------------------------------
+
+        #region Public Methods --------------------------------------
+        public static string CreateConfirmEmailWithPassword(string callbackUrl, string password)
+        {
+            var body = CreateEmailBody(ConfigurationManager.AppSettings["emailTemplates:ConfirmEmailWithPassword"], new Dictionary<string, string>() { { "callbackUrl", callbackUrl }, { "password", password } });
+
+            return body;
         }
         #endregion --------------------------------------------------
     }

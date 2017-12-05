@@ -6,10 +6,11 @@ using Microsoft.Owin.Security.OAuth;
 using Newtonsoft.Json.Serialization;
 using Owin;
 using RootSolutions.Common.Logger;
-using RootSolutions.Common.Services;
 using RootSolutions.Common.Web.Infrastructure;
 using RootSolutions.Common.Web.Providers;
 using RootSolutions.NetDiet.Therapist.API.Infrastructure;
+using RootSolutions.NetDiet.Therapist.API.Providers;
+using RootSolutions.NetDiet.Therapist.API.Services;
 using System;
 using System.Configuration;
 using System.Linq;
@@ -47,7 +48,7 @@ namespace RootSolutions.NetDiet.Therapist.API
                 AllowInsecureHttp = true,
                 TokenEndpointPath = new PathString("/oauth/token"),
                 AccessTokenExpireTimeSpan = TimeSpan.FromDays(1),
-                Provider = new RsOAuthProvider<NdUser, RsUserManagerWithMessageService<NdUser, NdDbContext, NdEmailService>>(new DefaultLogger()),
+                Provider = new NdOAuthProvider(new DefaultLogger()),
 #if DEBUG
                 AccessTokenFormat = new RsJwtFormatProvider("http://localhost/NetDiet/Therapist")
 #else
